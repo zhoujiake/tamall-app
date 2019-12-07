@@ -24,6 +24,7 @@
 	export default {
 		data() {
 			return {
+				pageNum: 1,
 				sizeCalcState: false,
 				tabScrollTop: 0,
 				currentId: 1,
@@ -40,9 +41,13 @@
 		},
 		onLoad(){
 			this.loadData();
-		    uni.setNavigationBarTitle({
-					title: this.lang.goodsType
-			});
+			var title = this.lang.goodsType;
+			setTimeout(function() {
+				uni.setNavigationBarTitle({
+						title: title
+				});
+			},300)
+		   
 		},
 		computed:{
 			...mapState([
@@ -62,13 +67,13 @@
 							list.forEach(item => {
 								let first = {id: item.categoryId,
 										     name: item.categoryName
-										  };
+										    };
 								this.flist.push(first);
 									item.secondLevelCategoryVOS.forEach(sec => {
 										let second = {id: sec.categoryId,
 										             pid: item.categoryId,
 												     name: sec.categoryName
-												  };
+												    };
 										this.slist.push(second);
 											sec.thirdLevelCategoryVOS.forEach(thir => {
 												let third = {

@@ -2,7 +2,7 @@
 	<view class="app">
 		<view class="price-box">
 			<text>支付金额</text>
-			<text class="price">38.88</text>
+			<text class="price">{{amount}}</text>
 		</view>
 
 		<view class="pay-type-list">
@@ -51,16 +51,18 @@
 		data() {
 			return {
 				payType: 1,
-				orderInfo: {}
+				orderInfo: {},
+				orderNo: 0,
+				amount: 0
 			};
 		},
 		computed: {
 		
 		},
 		onLoad(options) {
-			
+			this.orderNo = options.orderNo;
+			this.amount = options.amount;
 		},
-
 		methods: {
 			//选择支付方式
 			changePayType(type) {
@@ -68,9 +70,20 @@
 			},
 			//确认支付
 			confirm: async function() {
-				uni.redirectTo({
-					url: '/pages/money/paySuccess'
-				})
+				// 取消订单
+				uni.request({
+					url: this.$baseUrl + "paySuccess?orderNo="+ this.orderNo +"&payType=" + this.payType,
+					method: "GET",
+					success: (res) => {
+						if (res.data.resultCode == 200) {
+							uni.redirectTo({
+								url: '/pages/money/paySuccess'
+							})
+						} else {
+						}
+					}
+				});
+				
 			},
 		}
 	}

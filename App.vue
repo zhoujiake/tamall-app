@@ -43,7 +43,7 @@
 					  index: 3,
 					  text: mine,
 					  iconPath: 'static/tab-my.png',
-					  selectedIconPath: 'static/tab-cart-current.png'
+					  selectedIconPath: 'static/tab-my-current.png'
 					})
 				},500)
 			}
@@ -71,6 +71,7 @@
 		font-style: normal;
 		src: url('https://at.alicdn.com/t/font_1078604_w4kpxh0rafi.ttf') format('truetype');
 	}
+	
 
 	.yticon {
 		font-family: "yticon" !important;

@@ -119,9 +119,9 @@
 			</view>
 			
 			<view class="action-btn-group">
-				<button type="primary" class=" action-btn no-border buy-now-btn" @click="buy">
+				<button type="primary" class=" action-btn no-border buy-now-btn" @click="addShopCart(true)">
 					{{lang.buyNow}}</button>
-				<button type="primary" class=" action-btn no-border add-cart-btn" @tap="addShopCart">
+				<button type="primary" class=" action-btn no-border add-cart-btn" @tap="addShopCart(false)">
 					{{lang.addToCart}}</button>
 			</view>
 		</view>
@@ -201,7 +201,7 @@
 			let id = options.id;
 			this.getDetailForGoods(id);
 			//规格 默认选中第一条
-			this.specList.forEach(item=>{
+			this.specList.forEach(item=> {
 				for(let cItem of this.specChildList){
 					if(cItem.pid === item.id){
 						this.$set(cItem, 'selected', true);
@@ -280,12 +280,23 @@
 				this.favorite = !this.favorite;
 			},
 			buy(){
+				// 提交订单
+				let goodsData = [];
+				goodsData.push({
+					goodsId: this.goods.goodsId,
+					goodsName: this.goods.goodsName,
+					goodsCount: this.goods.goodsCount,
+					goodsCoverImg: this.goods.goodsCoverImg,
+					sellingPrice: this.goods.sellingPrice,
+				})
 				uni.navigateTo({
-					url: `/pages/order/createOrder`
+					url: `/pages/order/createOrder?data=${JSON.stringify({
+						goodsData: goodsData
+					})}`
 				})
 			},
 			stopPrevent(){},
-			addShopCart() {
+			addShopCart(isBuyAcation) {
 				var data = {
 					'goodsId': this.goods.goodsId, 
 				    'goodsCount': 1
@@ -300,9 +311,11 @@
 					method: "POST",
 				    success: (res) => {
 						 if (res.data.resultCode == 200) {
-							 uni.showToast({
-							 	title: this.lang.addToShopCartSuccess
-							 })
+							 if (isBuyAcation) {
+								this.buy()
+							 } else {
+								this.$api.msg(this.lang.addToShopCartSuccess);
+							 }
 						 } else {
 						 	this.$api.msg(res.data.message);
 						 }

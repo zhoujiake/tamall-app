@@ -145,7 +145,6 @@ import {mapState, mapMutations} from 'vuex';
 						 }
 				    }
 				});
-				// this.$api.prePage().refreshList(data, this.manageType);
 			},
 		}
 	}

@@ -41,11 +41,11 @@
 		<view class="yt-list">
 			<view class="yt-list-cell b-b" @click="toggleMask('show')">
 				<view class="cell-icon">
-					券
+					{{lang.coupon}}
 				</view>
-				<text class="cell-tit clamp">优惠券</text>
+				<text class="cell-tit clamp">{{lang.couponIconTitle}}</text>
 				<text class="cell-tip active">
-					选择优惠券
+					{{lang.chooseACoupon}}
 				</text>
 				<text class="cell-more wanjia wanjia-gengduo-d"></text>
 			</view>
@@ -60,31 +60,31 @@
 		<!-- 金额明细 -->
 		<view class="yt-list">
 			<view class="yt-list-cell b-b">
-				<text class="cell-tit clamp">商品金额</text>
+				<text class="cell-tit clamp">{{lang.discountedPrice}}</text>
 				<text class="cell-tip">{{lang.moneyFlag + sellingPrice}}</text>
 			</view>
 			<view class="yt-list-cell b-b">
-				<text class="cell-tit clamp">优惠金额</text>
+				<text class="cell-tit clamp">{{lang.discountedPrices}}</text>
 				<text class="cell-tip red">0</text>
 			</view>
 			<view class="yt-list-cell b-b">
-				<text class="cell-tit clamp">运费</text>
-				<text class="cell-tip">免运费</text>
+				<text class="cell-tit clamp">{{lang.freight}}</text>
+				<text class="cell-tip">{{lang.freeShipping}}</text>
 			</view>
 			<view class="yt-list-cell desc-cell">
-				<text class="cell-tit clamp">备注</text>
-				<input class="desc" type="text" v-model="desc" placeholder="请填写备注信息" placeholder-class="placeholder" />
+				<text class="cell-tit clamp">{{lang.remark}}</text>
+				<input class="desc" type="text" v-model="desc" :placeholder="remarkPlaceholder" placeholder-class="placeholder" />
 			</view>
 		</view>
 		
 		<!-- 底部 -->
 		<view class="footer">
 			<view class="price-content">
-				<text>实付款</text>
+				<text>{{lang.realPayment}}</text>
 				<text class="price-tip">{{lang.moneyFlag}}</text>
 				<text class="price">{{sellingPrice}}</text>
 			</view>
-			<text class="submit" @click="submit">提交订单</text>
+			<text class="submit" @click="submit">{{lang.submitOrder}}</text>
 		</view>
 		
 		<!-- 优惠券面板 -->
@@ -140,16 +140,21 @@
 					}
 				],
 				addressData: {
+					id: 0,
 					userId: '',
 					userName: '',
 					mobile: '',
 					address: '',
 					description: '',
 					isDefault: false,
-				}
+				},
+				remarkPlaceholder: ""
 			}
 		},
 		onLoad(option) {
+			uni.setNavigationBarTitle({
+				title: this.lang.createOrder
+			})
 			//商品数据
 			let data = JSON.parse(option.data);
 			this.goodsList = data.goodsData;
@@ -164,30 +169,44 @@
 					this.addressData = list[index];
 				}
 			}
+			this.remarkPlaceholder = this.lang.pleaseFillInTheNoteInformation
 		},
 		computed:{
 			...mapState(['lang'])
 		},
 		methods: {
 			//显示优惠券面板
-			toggleMask(type){
+			toggleMask(type) {
 				// let timer = type === 'show' ? 10 : 300;
 				// let	state = type === 'show' ? 1 : 0;
 				// this.maskState = 2;
 				// setTimeout(()=>{
 				// 	this.maskState = state;
 				// }, timer)
-			},
+			}, 
+			
 			numberChange(data) {
 				this.number = data.number;
 			},
 			changePayType(type){
 				this.payType = type;
 			},
-			submit(){
-				uni.redirectTo({
-					url: '/pages/money/pay'
-				})
+			submit() {
+				let id = this.addressData.id;
+				uni.request({
+				    url: this.$baseUrl + "saveOrderForApp/" + this.addressData.id, //仅为示例，并非真实接口地址。
+					method: "GET",
+				    success: (res) => {
+						 if (res.data.resultCode == 200) {
+							 let orderNo = res.data.data.orderNo
+							 uni.redirectTo({
+							 	url: `/pages/money/pay?orderNo=${orderNo}&amount=${this.sellingPrice}`
+							 })
+						 } else {
+						 	this.$api.msg(res.data.message);
+						 }
+				    }
+				});
 			},
 			stopPrevent(){}
 		}

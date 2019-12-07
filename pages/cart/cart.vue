@@ -98,16 +98,18 @@
 			};
 		},
 		onLoad(option) {
-			uni.setNavigationBarTitle({
-				title: this.lang.cart
-			})
+			var title = this.lang.cart;
+			setTimeout(function() {
+				uni.setNavigationBarTitle({
+					title: title
+				})
+			},300)
 			var d = option;
+		},
+		onShow() {
 			this.cartList = [];
 			this.total = 0;
 			this.loadData();
-		},
-		onShow() {
-			
 		},
 		watch:{
 			//显示空白页
@@ -242,8 +244,8 @@
 			createOrder() {
 				let list = this.cartList;
 				let goodsData = [];
-				list.forEach(item=>{
-					if(item.checked){
+				list.forEach(item=> {
+					if(item.checked) {
 						goodsData.push({
 							goodsId: item.goodsId,
 							goodsName: item.goodsName,
@@ -259,7 +261,6 @@
 						goodsData: goodsData
 					})}`
 				})
-				this.$api.msg('跳转下一页 sendData');
 			}
 		}
 	}

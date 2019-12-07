@@ -64,7 +64,7 @@
 		}, {
 			"path": "pages/cart/cart",
 			"style": {
-				"navigationBarTitleText": "购物车"
+				"navigationBarTitleText": ""
 			}
 		}, {
 			"path": "pages/public/login",
@@ -89,7 +89,7 @@
 		}, {
 			"path": "pages/user/user",
 			"style": {
-				"navigationBarTitleText": "我的",
+				"navigationBarTitleText": "",
 				// #ifdef MP
 				"navigationStyle": "custom",
 				// #endif
@@ -136,6 +136,14 @@
 				}
 			}
 		}, {
+			"path": "pages/order/orderStep",
+			"style": {
+				"navigationBarTitleText": "物流信息",
+				"app-plus": {
+					"bounce": "none"
+				}
+			}
+		}, {
 			"path": "pages/money/money",
 			"style": {}
 		}, {
@@ -174,7 +182,7 @@
         ,{
             "path" : "pages/category/category",
             "style" : {
-				"navigationBarTitleText": "分类",
+				"navigationBarTitleText": "",
 				"app-plus": {
 					"bounce": "none"
 				}

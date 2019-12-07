@@ -40,11 +40,11 @@
 			<view class="tj-sction">
 				<view class="tj-item">
 					<text class="num">128.8</text>
-					<text>余额</text>
-				</view>
-				<view class="tj-item">
-					<text class="num">0</text>
 					<text>优惠券</text>
+				</view>
+				<view class="tj-item" v-show="false">
+					<text class="num">-</text>
+					<text></text>
 				</view>
 				<view class="tj-item">
 					<text class="num">20</text>
@@ -92,8 +92,6 @@
 				<list-cell icon="icon-shezhi1" iconColor="#e07472" title="设置" border="" @eventClick="navTo('/pages/set/set')"></list-cell>
 			</view>
 		</view>
-			
-		
     </view>  
 </template>  
 <script>  
@@ -113,7 +111,13 @@
 				moving: false,
 			}
 		},
-		onLoad(){
+		onLoad() {
+			var title = this.lang.mine;
+			setTimeout(function() {
+				uni.setNavigationBarTitle({
+					title: title
+				})
+			},300)
 		},
 		// #ifndef MP
 		onNavigationBarButtonTap(e) {
@@ -136,7 +140,7 @@
 		},
 		// #endif
         computed: {
-			...mapState(['hasLogin','userInfo'])
+			...mapState(['hasLogin','userInfo', 'lang'])
 		},
         methods: {
 

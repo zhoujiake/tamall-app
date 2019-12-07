@@ -62,6 +62,7 @@
 		},
 		data() {
 			return {
+				pageNum: 1,
 				cateMaskState: 0, //分类面板展开状态
 				headerPosition:"fixed",
 				headerTop:"0px",
@@ -78,6 +79,8 @@
 			// #ifdef H5
 			this.headerTop = document.getElementsByTagName('uni-page-head')[0].offsetHeight+'px';
 			// #endif
+			
+			debugger
 			this.cateId = options.tid;
 			this.loadCateList(options.fid,options.sid);
 			this.loadData();
@@ -122,7 +125,7 @@
 					this.loadingType = 'more'
 				}
 				
-				let goodsList = await this.$api.json('goodsList');
+				/* let goodsList = await this.$api.json('goodsList');
 				if(type === 'refresh'){
 					this.goodsList = [];
 				}
@@ -137,13 +140,24 @@
 						}
 						return b.price - a.price;
 					})
-				}
-				
-				this.goodsList = this.goodsList.concat(goodsList);
-				
+				} */
+				debugger
+				// 获取分类商品列表
+				uni.request({
+					url: this.$baseUrl + 'searchForApp?keyword=&goodsCategoryId=' + this.cateId +'&orderBy=price&page=' + this.pageNum, 
+					method: "GET",
+					success: (res) => {
+						debugger
+						if (res.data.resultCode == 200) {
+							this.goodsList = res.data.data.list;
+							this.pageNum += 1
+						} else {
+						}
+					}
+				});
 				//判断是否还有下一页，有是more  没有是nomore(测试数据判断大于20就没有了)
 				this.loadingType  = this.goodsList.length > 20 ? 'nomore' : 'more';
-				if(type === 'refresh'){
+				if(type === 'refresh') {
 					if(loading == 1){
 						uni.hideLoading()
 					}else{
