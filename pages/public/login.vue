@@ -61,7 +61,7 @@
     } from 'vuex';
 	
 	export default{
-		data(){
+		data() {
 			return {
 				mobile: '',
 				password: '',
@@ -71,7 +71,7 @@
 				positionTop: 0
 			}
 		},
-		onLoad(){
+		onLoad() {
 			
 		},
 		onShow() {
@@ -125,8 +125,21 @@
 					method: "POST",
 				    success: (res) => {
 						 if (res.data.resultCode == 200) {
-							 this.login(res.data)
-							 console.log(res.data)
+							 let provider = res.data.data;
+							 var userInfo = {
+							 	'nickName': provider.nickName,
+							 	'loginName': provider.loginName,
+							 	'password': this.password,
+							 	'gender': provider.gender,
+							 	'email': provider.email,
+							 	'openId': provider.openId,
+							 	'loginType': provider.loginType,
+							 	'deviceInfo': this.$store.state.deviceInfo,
+							 	'province': provider.province,
+							 	'city': provider.city,
+							 	'countySeat': provider.countySeat,
+							 }
+							 this.login(userInfo)
 							 this.$api.msg('登录成功');
 							 uni.navigateBack();
 						 } else {

@@ -10,7 +10,7 @@
 			</view>
 			<view v-else class="empty-tips">
 				{{lang.empty}}
-				<view class="navigator" @click="navToLogin">{{lang.goTologin}}></view>
+				<view class="navigator" @click="navToLogin">{{lang.goToLogin}}</view>
 			</view>
 		</view>
 		<view v-else>
@@ -206,7 +206,7 @@
 								itemIds += item.cartItemId + ","
 							})
 							itemIds = itemIds.substring(0, itemIds.length - 1)
-							debugger
+							//debugger
 							uni.request({
 							    url: this.$baseUrl + "shop-cart-delete-all/" + itemIds,
 								method: "DELETE",

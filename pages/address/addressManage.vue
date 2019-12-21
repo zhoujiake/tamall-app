@@ -12,10 +12,12 @@
 		</view>
 		<view class="row b-b">
 			<text class="tit">{{lang.userAddress}}</text>
-			<text @click="chooseLocation" class="input">
+			<text @click="openAddres" class="input">
 				{{addressData.address}}
 			</text>
-			<text class="yticon icon-shouhuodizhi"></text>
+			<simple-address ref="simpleAddress" :pickerValueDefault="cityPickerValueDefault" 
+			   @onConfirm="onConfirm" themeColor='#007AFF'></simple-address>
+			<text  @click="openAddres" class="yticon icon-shouhuodizhi"></text>
 		</view>
 		<view class="row b-b"> 
 			<text class="tit">{{lang.addressDescription}}</text>
@@ -28,11 +30,13 @@
 			<switch :checked="addressData.isDefault" color="#fa436a" @change="switchChange" />
 		</view>
 		<button class="add-btn" @click="confirm">{{lang.commit}}</button>
+	
 	</view>
 </template>
 
 <script>
 import {mapState, mapMutations} from 'vuex';  
+import simpleAddress from "@/components/simple-address/simple-address.nvue"
 	export default {
 		data() {
 			return {
@@ -47,6 +51,8 @@ import {mapState, mapMutations} from 'vuex';
 				recipientUserName: '',
 				userMobil: '',
 				addressDescriptionPl: '',
+				cityPickerValueDefault: [0, 0, 1],
+				pickerText: ''
 			}
 		},
 		onLoad(option) {
@@ -65,6 +71,9 @@ import {mapState, mapMutations} from 'vuex';
 				title
 			})
 		},
+	    components: {
+		    simpleAddress
+		},
 		computed: {
 			...mapState([
 				'lang'
@@ -74,16 +83,13 @@ import {mapState, mapMutations} from 'vuex';
 			switchChange(e){
 				this.addressData.isDefault = e.isDefault;
 			},
-			
-			//地图选择地址
-			chooseLocation() {
-				uni.chooseLocation({
-					success: (data)=> {
-						this.addressData.address = data.address;
-					}
-				})
+			openAddres() {
+				this.$refs.simpleAddress.open();
 			},
-			
+			onConfirm(e) {
+ 				//this.addressData.address = JSON.stringify(e).label
+				this.addressData.address = e.label
+			},			
 			//提交
 			confirm() {
 				let data = this.addressData;
@@ -108,11 +114,12 @@ import {mapState, mapMutations} from 'vuex';
 				} else {
 					data.isDefault = 0
 				}
+				// 保存地址
 				uni.request({
-				    url: this.$baseUrl + "address/add", //仅为示例，并非真实接口地址。
+				    url: this.$baseUrl + "address/add", 
 					data: data,
 				    header: {
-						  'content-type': 'application/json' //自定义请求头信息
+						  'content-type': 'application/json'
 					  },
 					method: "PUT",
 				    success: (res) => {

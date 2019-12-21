@@ -72,13 +72,16 @@
 		src: url('https://at.alicdn.com/t/font_1078604_w4kpxh0rafi.ttf') format('truetype');
 	}
 	
-
 	.yticon {
 		font-family: "yticon" !important;
 		font-size: 16px;
 		font-style: normal;
 		-webkit-font-smoothing: antialiased;
 		-moz-osx-font-smoothing: grayscale;
+	}
+
+	.icon-switch_lang:before {
+		content: "\e744";
 	}
 
 	.icon-yiguoqi1:before {

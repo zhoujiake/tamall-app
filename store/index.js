@@ -10,7 +10,7 @@ try {
 	// 2. 如果用户没有选择过获取用户手机的语言
 	if(!userLang) {
 		const sys = uni.getSystemInfoSync();
-		// userLang = sys.language;
+		//userLang = sys.language;
 		userLang = "tb"; // 默认显示藏文
 		//userLang = "en"; // 默认显示藏文
 	}
@@ -56,16 +56,59 @@ const store = new Vuex.Store({
 		},
 		changeLang: function(state) {
 			uni.showActionSheet({
-				itemList:['藏文','简体中文', 'English'],
+				itemList:['བོད་ཡིག','简体中文'],
 				success: function(e) {
+					var langStr = ""
 					if(e.tapIndex == 0) {
 						lang = require('../language/tb.js');
+						langStr = "tb"
 					} else if (e.tapIndex == 1) {
 						lang = require('../language/zh.js');
+						langStr = "zh"
 					} else {
 						lang = require('../language/en.js');
+						langStr = "en"
 					}
+					//缓存用户登陆状态
+					uni.setStorage({
+					    key: 'userLang',  
+					    data: langStr  
+					})
+					// 改变资源js
 					state.lang = lang;
+					// 底部导航栏语言切换
+					var home = state.lang.homePage
+					var goodsType = state.lang.goodsType
+					var cart = state.lang.cart
+					var mine = state.lang.mine
+					setTimeout(function() {
+						// 重新设置tabbar的文字资源
+						uni.setTabBarItem({ // 首页
+						  index: 0,
+						  text: state.lang.homePage,
+						  iconPath: 'static/tab-home.png',
+						  selectedIconPath: 'static/tab-home-current.png'
+						})
+						uni.setTabBarItem({ // 分类
+						  index: 1,
+						  text: goodsType,
+						  iconPath: 'static/tab-cate.png',
+						  selectedIconPath: 'static/tab-cate-current.png'
+						})
+						uni.setTabBarItem({ // 购物车
+						  index: 2,
+						  text: cart,
+						  iconPath: 'static/tab-cart.png',
+						  selectedIconPath: 'static/tab-cart-current.png'
+						})
+						uni.setTabBarItem({ // 我的
+						  index: 3,
+						  text: mine,
+						  iconPath: 'static/tab-my.png',
+						  selectedIconPath: 'static/tab-my-current.png'
+						})
+					},500)
+					uni
 				}
 			})
 		},

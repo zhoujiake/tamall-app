@@ -5,7 +5,7 @@
 			"path": "pages/index/index",
 			"style": {
 				// #ifdef MP 
-				"navigationBarTitleText": "吖吖街",
+				"navigationBarTitleText": "阿千岗间",
 				//"navigationStyle": "custom",
 				// #endif 
 				"app-plus": {
@@ -131,6 +131,14 @@
 			"path": "pages/order/order",
 			"style": {
 				"navigationBarTitleText": "我的订单",
+				"app-plus": {
+					"bounce": "none"
+				}
+			}
+		}, {
+			"path": "pages/search/search",
+			"style": {
+				"navigationBarTitleText": "搜索",
 				"app-plus": {
 					"bounce": "none"
 				}

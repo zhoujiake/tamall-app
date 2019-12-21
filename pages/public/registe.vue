@@ -12,7 +12,7 @@
 		    <form @submit="toRegist">
 				<view class="input-content">
 					<view class="input-item">
-						<text class="tit">用户名/昵称</text>
+						<text class="tit">昵称</text>
 						<input 
 						    name="nickName"
 							type="text" 
@@ -22,7 +22,7 @@
 						/>
 					</view>
 				    <view class="input-item">
-				    	<text class="tit">手机号码</text>
+				    	<text class="tit">用户名/手机号码</text>
 				    	<input 
 				    	    name="loginName"
 				    		type="number" 

@@ -48,6 +48,7 @@ const prePage = () => {
 }
 
 const baseUrl = 'http://192.168.43.128:28089/';
+// const baseUrl = 'http://47.93.212.24:8080/scoa/';
 
 Vue.config.productionTip = false
 Vue.prototype.$fire = new Vue();

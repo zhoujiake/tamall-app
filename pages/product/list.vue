@@ -5,7 +5,7 @@
 				综合排序
 			</view>
 			<view class="nav-item" :class="{current: filterIndex === 1}" @click="tabClick(1)">
-				销量优先
+				新品
 			</view>
 			<view class="nav-item" :class="{current: filterIndex === 2}" @click="tabClick(2)">
 				<text>价格</text>
@@ -23,18 +23,18 @@
 				@click="navToDetailPage(item)"
 			>
 				<view class="image-wrapper">
-					<image :src="item.image" mode="aspectFill"></image>
+					<image :src="item.goodsCoverImg" mode="aspectFill"></image>
 				</view>
-				<text class="title clamp">{{item.title}}</text>
+				<text class="title clamp">{{item.goodsName}}</text>
 				<view class="price-box">
-					<text class="price">{{item.price}}</text>
-					<text>已售 {{item.sales}}</text>
+					<text class="price">{{lang.moneyFlag + item.sellingPrice}}</text>
+					<!-- <text>已售 {{item.sales}}</text> -->
 				</view>
 			</view>
 		</view>
 		<uni-load-more :status="loadingType"></uni-load-more>
-		
-		<view class="cate-mask" :class="cateMaskState===0 ? 'none' : cateMaskState===1 ? 'show' : ''" @click="toggleCateMask">
+		<!-- 分类显示 -->
+		<view v-show="false" class="cate-mask" :class="cateMaskState===0 ? 'none' : cateMaskState===1 ? 'show' : ''" @click="toggleCateMask">
 			<view class="cate-content" @click.stop.prevent="stopPrevent" @touchmove.stop.prevent="stopPrevent">
 				<scroll-view scroll-y class="cate-list">
 					<view v-for="item in cateList" :key="item.id">
@@ -56,45 +56,57 @@
 
 <script>
 	import uniLoadMore from '@/components/uni-load-more/uni-load-more.vue';
+	import {mapState} from 'vuex';  
 	export default {
 		components: {
 			uniLoadMore	
 		},
 		data() {
 			return {
+				orderBy: '',
 				pageNum: 1,
 				cateMaskState: 0, //分类面板展开状态
-				headerPosition:"fixed",
-				headerTop:"0px",
+				headerPosition: "fixed",
+				headerTop: "0px",
 				loadingType: 'more', //加载更多状态
 				filterIndex: 0, 
-				cateId: 0, //已选三级分类id
+				cateId: '', //已选三级分类id
 				priceOrder: 0, //1 价格从低到高 2价格从高到低
 				cateList: [],
-				goodsList: []
+				goodsList: [],
+				keyWord: ''
 			};
 		},
-		
-		onLoad(options){
+		computed:{
+			...mapState([
+				'lang'
+			])
+		},
+		onLoad(options) {
 			// #ifdef H5
 			this.headerTop = document.getElementsByTagName('uni-page-head')[0].offsetHeight+'px';
 			// #endif
-			
-			debugger
-			this.cateId = options.tid;
-			this.loadCateList(options.fid,options.sid);
+			if (options.tid) {
+				this.cateId = options.tid;
+			}
+			if(options.keyWord) {
+				this.keyWord = options.keyWord
+			}
+			// this.loadCateList(options.fid, options.sid);
 			this.loadData();
 		},
-		onPageScroll(e){
+		onPageScroll(e) {
 			//兼容iOS端下拉时顶部漂移
-			if(e.scrollTop>=0){
+			if(e.scrollTop>=0) {
 				this.headerPosition = "fixed";
-			}else{
+			} else {
 				this.headerPosition = "absolute";
 			}
 		},
 		//下拉刷新
 		onPullDownRefresh(){
+			this.pageNum = 1
+			this.goodsList = []
 			this.loadData('refresh');
 		},
 		//加载更多
@@ -103,11 +115,11 @@
 		},
 		methods: {
 			//加载分类
-			async loadCateList(fid, sid){
+			async loadCateList(fid, sid) {
 				let list = await this.$api.json('cateList');
 				let cateList = list.filter(item=>item.pid == fid);
 				
-				cateList.forEach(item=>{
+				cateList.forEach(item=> {
 					let tempList = list.filter(val=>val.pid == item.id);
 					item.child = tempList;
 				})
@@ -124,39 +136,26 @@
 				}else{
 					this.loadingType = 'more'
 				}
-				
-				/* let goodsList = await this.$api.json('goodsList');
-				if(type === 'refresh'){
-					this.goodsList = [];
-				}
-				//筛选，测试数据直接前端筛选了
-				if(this.filterIndex === 1){
-					goodsList.sort((a,b)=>b.sales - a.sales)
-				}
-				if(this.filterIndex === 2){
-					goodsList.sort((a,b)=>{
-						if(this.priceOrder == 1){
-							return a.price - b.price;
-						}
-						return b.price - a.price;
-					})
-				} */
-				debugger
 				// 获取分类商品列表
 				uni.request({
-					url: this.$baseUrl + 'searchForApp?keyword=&goodsCategoryId=' + this.cateId +'&orderBy=price&page=' + this.pageNum, 
+					url: this.$baseUrl + 'searchForApp?keyword=' + this.keyWord + '&goodsCategoryId=' 
+					+ this.cateId + '&orderBy=' + this.orderBy + '&page=' + this.pageNum, 
 					method: "GET",
 					success: (res) => {
-						debugger
-						if (res.data.resultCode == 200) {
-							this.goodsList = res.data.data.list;
+						if (res.data.resultCode == 200 && res.data.data.list.length > 0) {
+							let list = res.data.data.list
+							list.forEach(item => {
+								this.goodsList.push(item)
+							})
 							this.pageNum += 1
+							//判断是否还有下一页，有是more  没有是nomore
+							this.loadingType = res.data.data.list === 0 ? 'nomore' : 'more';
 						} else {
+							//没有是nomore
+							this.loadingType = 'nomore';
 						}
 					}
 				});
-				//判断是否还有下一页，有是more  没有是nomore(测试数据判断大于20就没有了)
-				this.loadingType  = this.goodsList.length > 20 ? 'nomore' : 'more';
 				if(type === 'refresh') {
 					if(loading == 1){
 						uni.hideLoading()
@@ -166,24 +165,30 @@
 				}
 			},
 			//筛选点击
-			tabClick(index){
-				if(this.filterIndex === index && index !== 2){
+			tabClick(index) {
+				// 选中当前的筛选条件，并且非价格筛选时执行！
+				if(this.filterIndex === index && index !== 2) {
 					return;
 				}
 				this.filterIndex = index;
-				if(index === 2){
-					this.priceOrder = this.priceOrder === 1 ? 2: 1;
-				}else{
+				// 选中当前的筛选条件，并且是价格筛选时执行！
+				if(index === 0) {
+					this.orderBy = ''
 					this.priceOrder = 0;
+				} else if(index === 1) {
+					this.orderBy = 'new'
+					this.priceOrder = 0;
+				} else if(index === 2) {
+					this.priceOrder = this.priceOrder === 1 ? 2: 1;
+					this.orderBy = this.priceOrder === 1 ? 'price': 'price-1'; 
 				}
 				uni.pageScrollTo({
 					duration: 300,
 					scrollTop: 0
 				})
+				this.pageNum = 1
+				this.goodsList = []
 				this.loadData('refresh', 1);
-				uni.showLoading({
-					title: '正在加载'
-				})
 			},
 			//显示分类面板
 			toggleCateMask(type){
@@ -210,7 +215,7 @@
 			//详情
 			navToDetailPage(item){
 				//测试数据没有写id，用title代替
-				let id = item.title;
+				let id = item.goodsId;
 				uni.navigateTo({
 					url: `/pages/product/product?id=${id}`
 				})
@@ -401,7 +406,6 @@
 			color: $uni-color-primary;
 			line-height: 1;
 			&:before{
-				content: '￥';
 				font-size: 26upx;
 			}
 		}

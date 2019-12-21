@@ -119,9 +119,9 @@
 			</view>
 			
 			<view class="action-btn-group">
-				<button type="primary" class=" action-btn no-border buy-now-btn" @click="addShopCart(true)">
+				<button type="primary" class="action-btn no-border buy-now-btn" @click="addShopCart(true)">
 					{{lang.buyNow}}</button>
-				<button type="primary" class=" action-btn no-border add-cart-btn" @tap="addShopCart(false)">
+				<button type="primary" class="action-btn no-border add-cart-btn" @tap="addShopCart(false)">
 					{{lang.addToCart}}</button>
 			</view>
 		</view>
@@ -186,7 +186,7 @@
 				specClass: 'none',
 				specSelected:[],
 				goods: {},
-				favorite: true,
+				favorite: false,
 				shareList: [],
 				imgList: [],
 				desc: ``,
@@ -314,10 +314,16 @@
 							 if (isBuyAcation) {
 								this.buy()
 							 } else {
-								this.$api.msg(this.lang.addToShopCartSuccess);
+								var msg = this.lang.addToShopCartSuccess
+								uni.showToast({
+									title: msg,
+									duration : 1500
+								});
 							 }
 						 } else {
-						 	this.$api.msg(res.data.message);
+						 	uni.navigateTo({
+						 		url: '/pages/public/login'
+						 	})
 						 }
 				    }
 				});

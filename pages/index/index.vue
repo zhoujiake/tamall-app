@@ -14,7 +14,8 @@
 			<view class="titleNview-background" :style="{backgroundColor:titleNViewBackground}"></view>
 			<swiper class="carousel" :autoplay="true" :interval="3500" circular 
 			    @change="swiperChange" :duration="duration">
-				<swiper-item v-for="(item, index) in carouselList" :key="index" class="carousel-item" @click="navToDetailPage({title: ''})">
+				<swiper-item v-for="(item, index) in carouselList" :key="index" class="carousel-item"
+				 @click="navToList(item.redirectUrl)">
 					<image :src="item.carouselUrl" />
 				</swiper-item>
 			</swiper>
@@ -28,30 +29,30 @@
 		</view>
 		<!-- 分类 -->
 		<view class="cate-section">
-			<view class="cate-item">
+			<view class="cate-item" @click="navToList(121)">
 				<image src="/static/temp/c3.png"></image>
 				<text>{{lang.household}}</text>
 			</view>
-			<view class="cate-item">
+			<view class="cate-item" @click="navToList(116)">
 				<image src="/static/temp/c5.png"></image>
 				<text>{{lang.monkSupplies}}</text>
 			</view>
-			<view class="cate-item">
+			<view class="cate-item" @click="navToList(126)">
 				<image src="/static/temp/c6.png"></image>
 				<text>{{lang.accessories}}</text>
 			</view>
-			<view class="cate-item">
+			<view class="cate-item" @click="navToList(116)">
 				<image src="/static/temp/c7.png"></image>
 				<text>{{lang.thangka}}</text>
-			</view>
-			<view class="cate-item">
+			</view> 
+			<view class="cate-item" @click="navToList(143)">
 				<image src="/static/temp/c8.png"></image>
 				<text>{{lang.buddhaSupplies}}</text>
 			</view>
 		</view>
 		
 		<view class="ad-1"><!-- 广告图 -->
-			<image class="top-image" src="http://192.168.43.128:28089/upload/indexImage/212221212.jpg" mode="scaleToFill"></image>
+			<image class="top-image" :src="topImageUrl" mode="scaleToFill"></image>
 		</view>
 		
 		<!-- 热销商品 -->
@@ -69,9 +70,8 @@
 					class="g-swiper-item"
 					v-for="(item, index) in hotGoodsList" :key="index"
 					v-if="index%2 === 0"
-					@click="navToDetailPage(item)"
 				>
-					<view class="g-item left">
+					<view class="g-item left" @click="navToHotGoodsDetailPage(index)">
 						<image :src="item.goodsCoverImg" mode="aspectFill"></image>
 						<view class="t-box">
 							<text class="title clamp">{{item.goodsName}}</text>
@@ -82,7 +82,7 @@
 					    </view>
 					</view>
 					
-					<view class="g-item right">
+					<view class="g-item right" @click="navToHotGoodsDetailPage(index+1)">
 						<image :src="hotGoodsList[index+1].goodsCoverImg" mode="aspectFill"></image>
 						<view class="t-box">
 							<text class="title clamp">{{hotGoodsList[index+1].goodsName}}</text>
@@ -194,8 +194,6 @@
 			</view>
 		</view>
 		<uni-load-more :status="loadingType"></uni-load-more>
-		
-
 	</view>
 </template>
 
@@ -219,7 +217,8 @@ import {mapState, mapMutations} from 'vuex';
 				newGoodsImg3: "",
 				duration: 1000,
 				pageNum : 1,
-				cids : "108"
+				cids : "108",
+				topImageUrl : ''
 			};
 		},
 		onLoad() {
@@ -227,6 +226,7 @@ import {mapState, mapMutations} from 'vuex';
 		  this.loadHotGoodsesList(); // 加载热销商品数据
 		  this.newGoodsesList(); // 加载新品数据
 		  this.loadRecommendGoodsesList(); // 加载推荐商品数据
+		  this.topImageUrl = 'http://47.93.212.24:8080/upload/indexImage/212221212.jpg'
 		},
 		onReady() {
 			// 获取地理位置信息
@@ -312,7 +312,15 @@ import {mapState, mapMutations} from 'vuex';
 				this.swiperCurrent = index;
 				this.titleNViewBackground = this.carouselList[index].background;
 			},
-			//详情页
+			//热销详情页
+			navToHotGoodsDetailPage(index) {
+				//测试数据没有写id，用title代替
+				let id = this.hotGoodsList[index].goodsId;
+				uni.navigateTo({
+					url: `/pages/product/product?id=${id}`
+				})
+			},
+			//列表详情页
 			navToDetailPage(item) {
 				//测试数据没有写id，用title代替
 				let id = item.goodsId;
@@ -320,6 +328,7 @@ import {mapState, mapMutations} from 'vuex';
 					url: `/pages/product/product?id=${id}`
 				})
 			},
+			
 			/**
 			 * 热销商品
 			 */
@@ -390,11 +399,18 @@ import {mapState, mapMutations} from 'vuex';
 				});
 				
 			},
+			navToList(tid) {
+				uni.navigateTo({
+					url: `/pages/product/list?tid=${tid}`
+				})
+			},
 		},
 		// #ifndef MP
 		// 标题栏input搜索框点击
 		onNavigationBarSearchInputClicked: async function(e) {
-			this.$api.msg('点击了搜索框');
+			uni.navigateTo({
+				url: `/pages/search/search`
+			})
 		},
 		//点击导航栏 buttons 时触发
 		onNavigationBarButtonTap(e) {
