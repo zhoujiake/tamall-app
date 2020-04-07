@@ -86,26 +86,26 @@ const store = new Vuex.Store({
 						uni.setTabBarItem({ // 首页
 						  index: 0,
 						  text: state.lang.homePage,
-						  iconPath: 'static/tab-home.png',
-						  selectedIconPath: 'static/tab-home-current.png'
+						  iconPath: 'static/ic_home0.png',
+						  selectedIconPath: 'static/ic_home1.png'
 						})
 						uni.setTabBarItem({ // 分类
 						  index: 1,
 						  text: goodsType,
-						  iconPath: 'static/tab-cate.png',
-						  selectedIconPath: 'static/tab-cate-current.png'
+						  iconPath: 'static/ic_category0.png',
+						  selectedIconPath: 'static/ic_category1.png'
 						})
 						uni.setTabBarItem({ // 购物车
 						  index: 2,
 						  text: cart,
-						  iconPath: 'static/tab-cart.png',
-						  selectedIconPath: 'static/tab-cart-current.png'
+						  iconPath: 'static/ic_carte0.png',
+						  selectedIconPath: 'static/ic_carte1.png'
 						})
 						uni.setTabBarItem({ // 我的
 						  index: 3,
 						  text: mine,
-						  iconPath: 'static/tab-my.png',
-						  selectedIconPath: 'static/tab-my-current.png'
+						  iconPath: 'static/ic_mine0.png',
+						  selectedIconPath: 'static/ic_mine1.png'
 						})
 					},500)
 					uni

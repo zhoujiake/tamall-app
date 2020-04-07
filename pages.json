@@ -1,6 +1,5 @@
 {
 	"pages": [
-
 		{
 			"path": "pages/index/index",
 			"style": {
@@ -202,7 +201,44 @@
 				"enablePullDownRefresh": true,
 				"navigationBarTitleText": "商品列表"
 			}
-        }
+        },
+		{
+		    "path" : "pages/chat/chat",
+		    "style" : {
+				"navigationBarTitleText":"联系商家",
+		    	"navigationBarBackgroundColor":"#f2f2f2",
+		    	"backgroundColorTop":"#e5e5e5",
+		    	"backgroundColorBottom":"#e5e5e5",
+		    	"app-plus":{
+		    		"softinputNavBar":"none",
+		    		"bounce":"none"
+		    	}
+		    }
+		}
+		,{
+		    "path" : "pages/chat/details",
+		    "style" : {
+				"navigationBarBackgroundColor":"#cf3c35",
+				"navigationBarTextStyle":"white",
+				"navigationBarTitleText":"红包",
+				"backgroundColorTop":"#cf3c35",
+				"backgroundColorBottom":"#fff"
+			}
+		}
+		,{
+		    "path" : "pages/chat/hand",
+		    "style" : {
+		    	"navigationBarBackgroundColor":"#cf3c35",
+		    	"navigationBarTextStyle":"white",
+		    	"navigationBarTitleText":"发红包",
+		    	"backgroundColorTop":"#cf3c35",
+		    	"backgroundColorBottom":"#fff",
+				"app-plus":{
+					"softinputNavBar":"none",
+					"bounce":"none"
+				}
+		    }
+		}
     ],
 	"globalStyle": {
 		"navigationBarTextStyle": "black",
@@ -211,32 +247,32 @@
 		"backgroundColor": "#f8f8f8"
 	},
 	"tabBar": {
-		"color": "#C0C4CC",
-		"selectedColor": "#fa436a",
+		"color": "#b7bbc2",
+		"selectedColor": "#981D0A",
 		"borderStyle": "black",
 		"backgroundColor": "#ffffff",
 		"list": [{
 				"pagePath": "pages/index/index",
-				"iconPath": "static/tab-home.png",
-				"selectedIconPath": "static/tab-home-current.png",
+				"iconPath": "static/ic_home0.png",
+				"selectedIconPath": "static/ic_home1.png",
 				"text": ""
 			},
-			{
+			{ 
 				"pagePath": "pages/category/category",
-				"iconPath": "static/tab-cate.png",
-				"selectedIconPath": "static/tab-cate-current.png",
+				"iconPath": "static/ic_category0.png",
+				"selectedIconPath": "static/ic_category1.png",
 				"text": ""
 			},
 			{
 				"pagePath": "pages/cart/cart",
-				"iconPath": "static/tab-cart.png",
-				"selectedIconPath": "static/tab-cart-current.png",
+				"iconPath": "static/ic_carte0.png",
+				"selectedIconPath": "static/ic_carte1.png",
 				"text": ""
 			},
 			{
 				"pagePath": "pages/user/user",
-				"iconPath": "static/tab-my.png",
-				"selectedIconPath": "static/tab-my-current.png",
+				"iconPath": "static/ic_mine0.png",
+				"selectedIconPath": "static/ic_mine1.png",
 				"text": ""
 			}
 		]

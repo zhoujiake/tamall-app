@@ -47,7 +47,6 @@
 						title: title
 				});
 			},300)
-		   
 		},
 		computed:{
 			...mapState([

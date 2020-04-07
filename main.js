@@ -10,6 +10,8 @@ import http from '@/utils/HttpRequest.js'
 import common from '@/common/common.js'
 
 import formatDate from '@/utils/FormatDate.js'
+
+import jimSdk from '@/lib/jmessage-wxapplet-sdk-1.4.2.min.js'// 引入JMessage
 /**
  *  因工具函数属于公司资产, 所以直接在Vue实例挂载几个常用的函数
  *  所有测试用数据均存放于根目录json.js
@@ -47,10 +49,15 @@ const prePage = () => {
 	return prePage.$vm;
 }
 
-const baseUrl = 'http://192.168.43.128:28089/';
-// const baseUrl = 'http://47.93.212.24:8080/scoa/';
+// const baseUrl = 'http://192.168.43.128:28089/';
+// const baseUrl = 'http://172.20.10.2:28089/';
+// const baseUrl = 'http://192.168.1.18:28089/';
+const baseUrl = 'http://123.56.109.42:8080/scoa/';
 
-Vue.config.productionTip = false
+// 初始化JMI
+const JIM = new jimSdk();
+
+Vue.config.productionTip = false 
 Vue.prototype.$fire = new Vue();
 Vue.prototype.$store = store;
 Vue.prototype.$api = {msg, json, prePage};
@@ -58,6 +65,7 @@ Vue.prototype.$baseUrl = baseUrl;
 Vue.prototype.$http = http;
 Vue.prototype.$common = common;
 Vue.prototype.$formatDate = formatDate;
+Vue.prototype.$JIM = JIM;
 Vue.use(VueCookie);
 
 

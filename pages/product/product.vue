@@ -76,7 +76,7 @@
 		</view>
 		
 		<!-- 评价 -->
-		<view class="eva-section">
+		<!-- <view class="eva-section">
 			<view class="e-header">
 				<text class="tit">评价</text>
 				<text>(86)</text>
@@ -94,7 +94,7 @@
 					</view>
 				</view>
 			</view>
-		</view>
+		</view> -->
 		
 		<view class="detail-desc">
 			<view class="d-header">
@@ -102,7 +102,9 @@
 			</view>
 			<rich-text class="rich-view" :nodes="desc"></rich-text>
 		</view>
-		
+		<view class="page-chat-button">
+			<image src="../../static/ic_contact.png" @click="toChatPage()"></image>
+		</view>
 		<!-- 底部操作菜单 -->
 		<view class="page-bottom">
 			<navigator url="/pages/index/index" open-type="switchTab" class="p-b-btn">
@@ -296,6 +298,10 @@
 				})
 			},
 			stopPrevent(){},
+			toChatPage(){
+				uni.navigateTo({
+				url: '/pages/chat/chat'
+			})},
 			addShopCart(isBuyAcation) {
 				var data = {
 					'goodsId': this.goods.goodsId, 
@@ -832,5 +838,24 @@
 			}
 		}
 	}
-	
+	.page-chat-button {
+		position:fixed;
+		right: 36upx;
+		bottom:160upx;
+		z-index: 95;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		width: 120upx;
+		height: 100upx;
+		background: rgba(255,255,255,.9);
+		box-shadow: 0 0 20upx 0 rgba(0,0,0,.5);
+		border-radius: 16upx;
+		
+		image{
+			padding: 14upx;
+			width: 120upx;
+			height: 100upx;
+		}
+	}
 </style>

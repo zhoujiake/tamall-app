@@ -93,5 +93,6 @@ module.exports = {
 	nowOpenMember: 'མྱུར་བར་འབྱེད་པ།',
 	openMember: 'ཚོགས་མི།',
 	switchLanguage: 'བོད་ཡིག > 中文',
+	toChat: 'འབྲེལ་གཏུག',
 	
 }

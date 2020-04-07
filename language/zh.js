@@ -93,5 +93,5 @@ module.exports = {
 	openMember: '开通会员',
 	toBeReceived: '待收货',
 	switchLanguage: '中文 > བོད་ཡིག',
-	
+	toChat: '联系商家',
 }
