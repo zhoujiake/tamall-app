@@ -5,7 +5,7 @@
 			     :scroll-with-animation="scrollAnimation" :scroll-top="scrollTop" 
 			     :scroll-into-view="scrollToView" @scrolltoupper="loadHistory" upper-threshold="50">
 				<!-- 加载历史数据waitingUI -->
-				<view class="loading">
+				<view class="loading" v-if="isHistoryLoading">
 					<view class="spinner">
 						<view class="rect1"></view>
 						<view class="rect2"></view>
@@ -14,90 +14,56 @@
 						<view class="rect5"></view>
 					</view>
 				</view>
-				<view class="row" v-for="(row,index) in msgList" :key="index" :id="'msg'+row.msg.id">
-					<!-- 系统消息 -->
-					<block v-if="row.type=='system'" >
-						<view class="system">
-							<!-- 文字消息 -->
-							<view v-if="row.msg.type=='text'" class="text">
-								{{row.msg.content.text}}
-							</view>
-							<!-- 领取红包消息 -->
-							<view v-if="row.msg.type=='redEnvelope'" class="red-envelope">
-								<image src="/static/chat-img/red-envelope-chat.png"></image>
-								{{row.msg.content.text}}
-							</view>
-						</view>
-					</block>
+				<view class="row" v-for="(row,index) in msgList" :key="index" :id="row.msg_id">
 					<!-- 用户消息 -->
-					<block v-if="row.type=='user'">
+					<block>
 						<!-- 自己发出的消息 -->
-						<view class="my" v-if="row.msg.userinfo.uid==myuid">
+						<view class="my" v-if="row.msg_type==6">
 							<!-- 左-消息 -->
 							<view class="left">
 								<!-- 文字消息 -->
-								<view v-if="row.msg.type=='text'" class="bubble">
-									<rich-text :nodes="row.msg.content.text"></rich-text>
+								<view v-if="row.content.msg_type=='text'" class="bubble">
+									<rich-text :nodes="row.content.msg_body.text"></rich-text>
 								</view>
 								<!-- 语言消息 -->
-								<view v-if="row.msg.type=='voice'" class="bubble voice" @tap="playVoice(row.msg)" :class="playMsgid == row.msg.id?'play':''">
-									<view class="length">{{row.msg.content.length}}</view>
+								<view v-if="row.content.msg_type=='voice'" class="bubble voice" @tap="playVoice(row.content)" :class="playMsgid == row.content.msg_id?'play':''">
+									<view class="length">{{row.content.msg_body.length}}</view>
 									<view class="icon my-voice"></view>
 								</view>
 								<!-- 图片消息 -->
-								<view v-if="row.msg.type=='img'" class="bubble img" @tap="showPic(row.msg)">
-									<image :src="row.msg.content.url" :style="{'width': row.msg.content.w+'px','height': row.msg.content.h+'px'}"></image>
+								<view v-if="row.content.msg_type=='image'" class="bubble img" @tap="showPic(row.content)">
+									<image :src="row.content.msg_body.media_id" :style="{'width': row.content.msg_body.width+'px','height': row.content.msg_body.height+'px'}"></image>
 								</view>
-								<!-- 红包 -->
-								<view v-if="row.msg.type=='redEnvelope'" class="bubble red-envelope" @tap="openRedEnvelope(row.msg,index)">
-									<image src="/static/chat-img/red-envelope.png"></image>
-									<view class="tis">
-										<!-- 点击开红包 -->
-									</view>
-									<view class="blessing">
-										{{row.msg.content.blessing}}
-									</view>
-								</view>
-								
 							</view>
 							<!-- 右-头像 -->
 							<view class="right">
-								<image :src="row.msg.userinfo.face"></image>
+								<image src="/static/chat-img/im/face/face_1.jpg"></image>
 							</view>
 						</view>
 						<!-- 别人发出的消息 -->
-						<view class="other" v-if="row.msg.userinfo.uid!=myuid">
+						<view class="other" v-if="row.msg_type==3">
 							<!-- 左-头像 -->
 							<view class="left">
-								<image :src="row.msg.userinfo.face"></image>
+								<image src="/static/app-icon.png"></image>
 							</view>
 							<!-- 右-用户名称-时间-消息 -->
 							<view class="right">
 								<view class="username">
-									<view class="name">{{row.msg.userinfo.username}}</view> <view class="time">{{row.msg.time}}</view>
+									<view class="name">{{targetNickname}}</view> 
+									<view class="time">{{parsingDate(row.ctime_ms)}}</view>
 								</view>
 								<!-- 文字消息 -->
-								<view v-if="row.msg.type=='text'" class="bubble">
-									<rich-text :nodes="row.msg.content.text"></rich-text>
+								<view v-if="row.content.msg_type=='text'" class="bubble">
+									<rich-text :nodes="row.content.msg_body.text"></rich-text>
 								</view>
 								<!-- 语音消息 -->
-								<view v-if="row.msg.type=='voice'" class="bubble voice" @tap="playVoice(row.msg)" :class="playMsgid == row.msg.id?'play':''">
+								<view v-if="row.content.msg_type=='voice'" class="bubble voice" @tap="playVoice(row.content)" :class="playMsgid == row.msg_id?'play':''">
 									<view class="icon other-voice"></view>
-									<view class="length">{{row.msg.content.length}}</view>
+									<view class="length">{{row.content.msg_body.length}}</view>
 								</view>
 								<!-- 图片消息 -->
-								<view v-if="row.msg.type=='img'" class="bubble img" @tap="showPic(row.msg)">
-									<image :src="row.msg.content.url" :style="{'width': row.msg.content.w+'px','height': row.msg.content.h+'px'}"></image>
-								</view>
-								<!-- 红包 -->
-								<view v-show="false" v-if="row.msg.type=='redEnvelope'" class="bubble red-envelope" @tap="openRedEnvelope(row.msg,index)">
-									<image src="/static/chat-img/red-envelope.png"></image>
-									<view class="tis">
-										<!-- 点击开红包 -->
-									</view>
-									<view class="blessing">
-										{{row.msg.content.blessing}}
-									</view>
+								<view v-if="row.content.msg_type=='image'" class="bubble img" @tap="showPic(row.content)">
+									<image :src="row.content.msg_body.media_id" :style="{'width': row.content.msg_body.width+'px','height': row.content.msg_body.height+'px'}"></image>
 								</view>
 							</view>
 						</view>
@@ -165,27 +131,6 @@
 			<view class="cancel" :class="willStop?'':'hidden'"><view class="icon chehui" ></view></view>
 			<view class="tis" :class="willStop?'change':''">{{recordTis}}</view>
 		</view>
-		<!-- 红包弹窗 -->
-		<view class="windows" v-show="false" :class="windowsState">
-			<!-- 遮罩层 -->
-			<view class="mask" @touchmove.stop.prevent="discard" @tap="closeRedEnvelope"></view>
-			<view class="layer" @touchmove.stop.prevent="discard">
-				<view class="open-redenvelope">
-					<view class="top">
-						<view class="close-btn">
-							<view class="icon close" @tap="closeRedEnvelope"></view>
-						</view>
-						<image src="/static/chat-img/im/face/face_1.jpg"></image>
-					</view>
-					<view class="from">来自{{redenvelopeData.from}}</view>
-					<view class="blessing">{{redenvelopeData.blessing}}</view>
-					<view class="money">{{redenvelopeData.money}}</view>
-					<view class="showDetails" @tap="toDetails(redenvelopeData.rid)">
-						查看领取详情 <view class="icon to"></view>
-					</view>
-				</view>
-			</view>
-		</view>
 	</view>
 </template>
 <script>
@@ -245,22 +190,18 @@ import {mapState, mapMutations} from 'vuex';
 					blessing:null,
 					money:null
 				},
-				authPayload : {
-					"appkey":"",
-					"random_str":  "",
-					"signature":  '',
-					"timestamp":  0,
-					"flag": 1
-				},
-				userInfo: {},
-				acrossUser: "12345678",
-				targetNickname: "tamall-manager",
+				acrossUser: "",
+				targetNickname: "",
 				localMsgList: [],
-				pageIndex: 2// 聊天消息的页码
+				pageIndex: 1// 聊天消息的页码
 			};
 		},
 		onLoad(option) {
-			this.getMsgList();
+			this.avatar = option.avatar
+			this.targetNickname = option.nickName
+			this.acrossUser = option.username
+			console.log(this.acrossUser)
+			this.getMsgList(this.acrossUser);
 			//语音自然播放结束
 			this.AUDIO.onEnded((res)=>{
 				this.playMsgid=null;
@@ -275,189 +216,54 @@ import {mapState, mapMutations} from 'vuex';
 				this.recordEnd(e);
 			})
 			// #endif
-			// jpush的相关信息
-			this.getJPushData();
-			// 初始化用户信息
-			this.userInfo = uni.getStorageSync("userInfo")
 			// 标题文字
 			var title = this.lang.toChat;
-			setTimeout(function() {
+			setTimeout(() => {
 				uni.setNavigationBarTitle({
-						title: title
+					title: this.targetNickname
 				});
 			},300)
+			this.setChatVueObject(this)
 		},
 		onShow(){
 			this.scrollTop = 9999999;
-			//模板借由本地缓存实现发红包效果，实际应用中请不要使用此方法。
-			uni.getStorage({
-				key: 'redEnvelopeData',
-				success:(res)=>{
-					console.log(res.data);
-					let nowDate = new Date();
-					let lastid = this.msgList[this.msgList.length-1].msg.id;
-					lastid++;
-					let row = {type:"user",msg:{id:lastid,type:"redEnvelope",time:nowDate.getHours()+":"+nowDate.getMinutes(),userinfo:{uid:0,username:"大黑哥",face:"/static/chat-img/face.jpg"},content:{blessing:res.data.blessing,rid:Math.floor(Math.random()*1000+1),isReceived:false}}};
-					this.screenMsg(row);
-					uni.removeStorage({key: 'redEnvelopeData'});
-				}
-			});
+		},
+		onUnload() {
+			this.setChatVueObject(null)
 		},
 		computed: {
 			...mapState([
-				'lang'
+				'lang',
+				'JIM',
+				'authPayload'			
 			])
 		},
 		methods:{
-			// jpush的相关信息
-			getJPushData() {
-				// 判断是否登录
-				if (!this.$JIM.isLogin()) {
-					// 判断是否初始化
-					if (!this.$JIM.isInit()) {
-						uni.request({
-							url: this.$baseUrl + "jpush-app-Kay", // 调用后台接口，获取初始化相关信息。
-							method: "GET",
-							success: (res) => {
-								if (res.data.resultCode == 200) {
-									//debugger
-									console.log(res.data.message)
-								    this.authPayload = JSON.parse(res.data.message);
-									// 初始化this.$JIM
-									this.$JIM.init(this.authPayload)
-									  .onSuccess(data => {
-										this.JMIlogin()// 登录
-									  	console.log("JIM init --> "+data)
-									  }).onFail(function(data) {
-									  	console.log("JIM init --> "+data)
-								    });
-								} else {
-								}
-							}
-						});
-					} else {
-						this.JMIlogin()// 登录
-					}
-				} else {
-					this.$JIM.onMsgReceive(function(data) {// 监听消息接收
-						data = JSON.stringify(data);
-						console.log('1msg_receive:' + data);
-					});
-				}
-			},
-			// JMI注册
-			JMIregister() {
-				this.$JIM.register({
-						'username' : this.userInfo.loginName,
-						'password': this.userInfo.password,
-						'nickname' : this.userInfo.nickName
-					}).onSuccess(data => {
-						this.JMIlogin()
-						console.log('success:' + JSON.stringify(data));
-				    }).onFail(function(data) {
-						console.log('error:' + JSON.stringify(data))
-				});
-			},
-			// JMI登录
-			JMIlogin(){	
-				this.$JIM.login({
-				            'username' : this.userInfo.loginName,
-							'password': this.userInfo.password,
-				        }).onSuccess(data => {
-				            console.log('success:' + JSON.stringify(data));
-							this.$JIM.onMsgReceive(function(data) {// 监听消息接收
-							debugger
-								data = JSON.stringify(data);
-								console.log('1msg_receive:' + data);
-							});
-				            this.$JIM.onEventNotification(function(data) {
-				                console.log('event_receive: ' + JSON.stringify(data));
-				            });
-							this.$JIM.onSyncConversation(function(data) { //离线消息同步监听
-				                console.log(data);
-				            });
-				           this.$JIM.onUserInfUpdate(function(data) {
-				                console.log('onUserInfUpdate : ' + JSON.stringify(data));
-				            });
-					        this.$JIM.onSyncEvent(function(data) {
-				                console.log('onSyncEvent : ' + JSON.stringify(data));
-				            });
-							this.$JIM.onMsgReceiptChange(function(data){
-							    console.log('onMsgReceiptChange : ' + JSON.stringify(data));
-							});
-							this.$JIM.onSyncMsgReceipt(function(data){
-							    console.log('onSyncMsgReceipt : ' + JSON.stringify(data));
-							});
-							this.$JIM.onMutiUnreadMsgUpdate(function(data){
-							    console.log('onConversationUpdate : ' + JSON.stringify(data));
-							});
-						    this.$JIM.onTransMsgRec(function(data){
-							    console.log('onTransMsgRec : ' + JSON.stringify(data));
-							});
-							this.$JIM.onRoomMsg (function(data){
-							    console.log('onRoomMsg  : ' + JSON.stringify(data));
-							});
-				        }).onFail(data => {
-							this.JMIregister()
-				            console.log('error:' + JSON.stringify(data));
-				        }).onTimeout(function(data) {
-				            console.log('timeout:' + JSON.stringify(data));
-				        });
-			},
+			...mapMutations(['getJPushData','setChatVueObject']),
 			// 接受消息(筛选处理)
 			screenMsg(msg){
 				//从长连接处转发给这个方法，进行筛选处理
-				if(msg.type=='system'){
-					// 系统消息
-					switch (msg.msg.type){
-						case 'text':
-							this.addSystemTextMsg(msg);
-							break;
-						case 'redEnvelope':
-							this.addSystemRedEnvelopeMsg(msg);
-							break;
-					}
-				}else if(msg.type=='user'){
 					// 用户消息
-					switch (msg.msg.type){
+					switch (msg.content.msg_type){
 						case 'text':
 							this.addTextMsg(msg);
 							break;
 						case 'voice':
 							this.addVoiceMsg(msg);
 							break;
-						case 'img':
+						case 'image':
 							this.addImgMsg(msg);
-							break;
-						case 'redEnvelope':
-							this.addRedEnvelopeMsg(msg);
 							break;
 					}
 					console.log('用户消息');
 					//非自己的消息震动
-					if(msg.msg.userinfo.uid!=this.myuid){
+					if(msg.msg_type == 3) {
 						console.log('振动');
 						uni.vibrateLong();
 					}
-					// 获取本地消息记录
-					// debugger
-					if (this.localMsgList) { // 判断消息是否存在
-						this.localMsgList.push(msg)
-						uni.setStorage({//缓存用户登陆状态
-						    key: 'msgList',  
-						    data: this.localMsgList
-						})
-					} else { // 初始化聊天记录缓存
-						// 消息记录保存到本地
-						uni.setStorage({//缓存用户登陆状态
-						    key: 'msgList',  
-						    data: this.msgList  
-						})
-					}
-				}
 				this.$nextTick(function() {
 					// 滚动到底
-					this.scrollToView = 'msg'+msg.msg.id
+					this.scrollToView = 0
 				});
 			},
 			//触发滑动到顶部(加载历史信息记录)
@@ -467,25 +273,28 @@ import {mapState, mapMutations} from 'vuex';
 				}
 				this.isHistoryLoading = true;//参数作为进入请求标识，防止重复请求
 				this.scrollAnimation = false;//关闭滑动动画
-				let Viewid = this.msgList[0].msg.id;//记住第一个信息ID
+				let Viewid = this.msgList[0].content.msg_id;//记住第一个信息ID
 				//本地模拟请求历史记录效果
-				setTimeout(()=>{
-					// 消息列表
-					// let list = [
-					// 	{type:"user",msg:{id:1,type:"text",time:"12:56",userinfo:{uid:0,username:"大黑哥",face:"/static/chat-img/face.jpg"},content:{text:"为什么温度会相差那么大？"}}},
-					// 	{type:"user",msg:{id:2,type:"text",time:"12:57",userinfo:{uid:1,username:"售后客服008",face:"/static/chat-img/im/face/face_2.jpg"},content:{text:"这个是有偏差的，两个温度相差十几二十度是很正常的，如果相差五十度，那即是质量问题了。"}}},
-					// 	{type:"user",msg:{id:3,type:"voice",time:"12:59",userinfo:{uid:1,username:"售后客服008",face:"/static/chat-img/im/face/face_2.jpg"},content:{url:"/static/voice/1.mp3",length:"00:06"}}},
-					// 	{type:"user",msg:{id:4,type:"voice",time:"13:05",userinfo:{uid:0,username:"大黑哥",face:"/static/chat-img/face.jpg"},content:{url:"/static/voice/2.mp3",length:"00:06"}}},
-					// ]
-					let list = this.getMsgListByPageIndex(this.pageIndex,10,this.localMsgList)
+				setTimeout(() => {
+					let list = this.getMsgListByPageIndex(this.pageIndex, 10, this.localMsgList)
 					this.pageIndex += 1
 					// 获取消息中的图片,并处理显示尺寸
 					for(let i=0;i<list.length;i++){
-						if(list[i].type=='user'&&list[i].msg.type=="img"){
-							list[i].msg.content = this.setPicSize(list[i].msg.content);
-							this.msgImgList.unshift(list[i].msg.content.url);
+						if(list[i].content.msg_type=='image'){
+							this.JIM.getResource({
+							  'media_id' : list[i].content.msg_body.media_id,
+							}).onSuccess( data => {
+							  //data.code 返回码
+							  //data.message 描述
+							  this.setPicSize(list[i].content.msg_body);
+							  list[i].content.msg_body.media_id = data.url // 资源临时访问路径，具体超时时间expire time会包含在url中
+							  this.msgImgList.unshift(list[i].content.msg_body.media_id);
+							}).onFail(function(data) {
+							  data.code // 返回码
+							  //data.message 描述
+							});
 						}
-						list[i].msg.id = Math.floor(Math.random()*1000+1);
+						// list[i].msg.id = Math.floor(Math.random()*1000+1);
 						this.msgList.unshift(list[i]);
 					}
 					//这段代码很重要，不然每次加载历史数据都会跳到顶部
@@ -499,40 +308,53 @@ import {mapState, mapMutations} from 'vuex';
 				},1000)
 			},
 			// 加载初始页面消息
-			getMsgList(){
-				let wellcomeMsg = {type:"system",msg:{id:0,type:"text",content:{text:"欢迎进入阿千岗间"}}}
-				// 消息列表
-				// let list = [
-				// 	{type:"system",msg:{id:0,type:"text",content:{text:"欢迎进入阿千岗间"}}},
-				// 	{type:"user",msg:{id:1,type:"text",time:"12:56",userinfo:{uid:0,username:"大黑哥",face:"/static/chat-img/face.jpg"},content:{text:"为什么温度会相差那么大？"}}},
-				// 	{type:"user",msg:{id:2,type:"text",time:"12:57",userinfo:{uid:1,username:"售后客服008",face:"/static/chat-img/im/face/face_2.jpg"},content:{text:"这个是有偏差的，两个温度相差十几二十度是很正常的，如果相差五十度，那即是质量问题了。"}}},
-				// 	{type:"user",msg:{id:3,type:"voice",time:"12:59",userinfo:{uid:1,username:"售后客服008",face:"/static/chat-img/im/face/face_2.jpg"},content:{url:"/static/voice/1.mp3",length:"00:06"}}},
-				// 	{type:"user",msg:{id:4,type:"voice",time:"13:05",userinfo:{uid:0,username:"大黑哥",face:"/static/chat-img/face.jpg"},content:{url:"/static/voice/2.mp3",length:"00:06"}}},
-				// 	{type:"user",msg:{id:5,type:"img",time:"13:05",userinfo:{uid:0,username:"大黑哥",face:"/static/chat-img/face.jpg"},content:{url:"/static/chat-img/p10.jpg",w:200,h:200}}},
-				// 	{type:"user",msg:{id:6,type:"img",time:"12:59",userinfo:{uid:1,username:"售后客服008",face:"/static/chat-img/im/face/face_2.jpg"},content:{url:"/static/chat-img/q.jpg",w:1920,h:1080}}},
-				// 	{type:"system",msg:{id:7,type:"text",content:{text:"欢迎进入阿千岗间"}}},
-					
-				// 	{type:"system",msg:{id:9,type:"redEnvelope",content:{text:"售后客服008领取了你的红包"}}},
-				// 	{type:"user",msg:{id:10,type:"redEnvelope",time:"12:56",userinfo:{uid:0,username:"大黑哥",face:"/static/chat-img/face.jpg"},content:{blessing:"恭喜发财，大吉大利，万事如意",rid:0,isReceived:false}}},
-				// 	{type:"user",msg:{id:11,type:"redEnvelope",time:"12:56",userinfo:{uid:1,username:"售后客服008",face:"/static/chat-img/im/face/face_2.jpg"},content:{blessing:"恭喜发财",rid:1,isReceived:false}}},
-				// ]
+			getMsgList(username){
+				debugger
+				let wellcomeMsg = {content:{msg_type:3,msg_body:{text:"暂无消息"}}}
 				// 获取本地消息记录
-				this.localMsgList = uni.getStorageSync("msgList")
-				let list = this.getMsgListByPageIndex(this.pageIndex,10,this.localMsgList)
+				this.localMsgList = uni.getStorageSync(username)
+				if (this.localMsgList === "") {
+					return
+				}
+				const compare = (key) => {
+				  return (obj1, obj2) => {
+				    let value1 = obj1[key]
+				    let value2 = obj2[key]
+				    if (value1 < value2) {
+				      return 1;
+				    } else if (value1 > value2) {
+				      return -1;
+				    } else {
+				      return 0
+				    }
+				  }
+				}
+				this.localMsgList.sort(compare(`ctime_ms`)) // 按时间降序
+				let list = this.getMsgListByPageIndex(this.pageIndex, 10, this.localMsgList)
 				this.pageIndex += 1
+				var msgIds = []// 消息id集合
 				// 获取消息中的图片,并处理显示尺寸
 				for(let i=0;i<list.length;i++) {
-					if(list[i].type=='user'&&list[i].msg.type=="img"){
-						list[i].msg.content = this.setPicSize(list[i].msg.content);
-						this.msgImgList.push(list[i].msg.content.url);
+					if(list[i].content.msg_type == 'image') {
+						this.JIM.getResource({
+						  'media_id' : list[i].content.msg_body.media_id,
+						}).onSuccess( data => {
+						  //data.code 返回码
+						  //data.message 描述
+						  this.setPicSize(list[i].content.msg_body);
+						  list[i].content.msg_body.media_id = data.url // 资源临时访问路径，具体超时时间expire time会包含在url中
+						  this.msgImgList.unshift(list[i].content.msg_body.media_id);
+						}).onFail(function(data) {
+						  //data.code 返回码
+						  data.message // 描述
+						});
 					}
+					this.msgList.unshift(list[i]);
+					msgIds.push(list[i].msg_id);
 				}
-				if (list) {
-					this.msgList = list;
-					this.msgList.splice(0,0,wellcomeMsg)
-				} else {
-					this.msgList.splice(0,0,wellcomeMsg)
-				}
+				if (!list) { // 当没有消息时执行
+					this.msgList.splice(0,0, wellcomeMsg)
+				} 
 				this.isHistoryLoading = false;
 				// 滚动到底部
 				this.$nextTick(function() {
@@ -540,8 +362,7 @@ import {mapState, mapMutations} from 'vuex';
 					this.scrollTop = 9999;
 					this.$nextTick(function() {
 						this.scrollAnimation = true;
-					});
-					
+					});					
 				});
 			},
 			//处理图片尺寸，如果不处理宽高，新进入页面加载图片时候会闪
@@ -549,12 +370,11 @@ import {mapState, mapMutations} from 'vuex';
 				// 让图片最长边等于设置的最大长度，短边等比例缩小，图片控件真实改变，区别于aspectFit方式。
 				let maxW = uni.upx2px(350);//350是定义消息图片最大宽度
 				let maxH = uni.upx2px(350);//350是定义消息图片最大高度
-				if(content.w>maxW||content.h>maxH){
-					let scale = content.w/content.h;
-					content.w = scale>1?maxW:maxH*scale;
-					content.h = scale>1?maxW/scale:maxH;
+				if(content.width>maxW||content.height>maxH){
+					let scale = content.width/content.height;
+					content.width = scale>1?maxW:maxH*scale;
+					content.height = scale>1?maxW/scale:maxH;
 				}
-				return content;
 			},
 			//更多功能(点击+弹出) 
 			showMore(){
@@ -607,18 +427,17 @@ import {mapState, mapMutations} from 'vuex';
 								success: (image)=>{
 									console.log(image.width);
 									console.log(image.height);
-									let msg = {url:res.tempFilePaths[i],w:image.width,h:image.height};
-									this.sendMsg(msg,'img');
+									let msg = {url:res.tempFilePaths[i],width:image.width,height:image.height};
+									this.sendMsg(msg,'image');
 									// 发送图片
-									this.$JIM.sendSinglePic({
+									this.JIM.sendSinglePic({
 									            'target_username' : this.acrossUser,
 												'target_nickname' : this.targetNickname,
 												'appkey' : this.authPayload.appkey,
 									            'image' : res.tempFilePaths[i],
 												'nead_receipt':true
 									        }).onSuccess(function(data, msg) {
-									            console.log('success:' + JSON.stringify(data));
-											    console.log('successssssss:' + JSON.stringify(msg));
+									            console.log('send image is success:' + JSON.stringify(data));
 									        }).onFail(function(data) {
 									            console.log('error:' + JSON.stringify(data));
 									});
@@ -629,7 +448,7 @@ import {mapState, mapMutations} from 'vuex';
 				});
 			},
 			// 选择表情
-			chooseEmoji(){
+			chooseEmoji() {
 				this.hideMore = true;
 				if(this.hideEmoji){
 					this.hideEmoji = false;
@@ -643,13 +462,13 @@ import {mapState, mapMutations} from 'vuex';
 				this.textMsg+=em.alt;
 			},			
 			//获取焦点，如果不是选表情ing,则关闭抽屉
-			textareaFocus(){
+			textareaFocus() {
 				if(this.popupLayerClass=='showLayer' && this.hideMore == false){
 					this.hideDrawer();
 				}
 			},
 			// 发送文字消息
-			sendText(){
+			sendText() {
 				this.hideDrawer();//隐藏抽屉
 				if(!this.textMsg){
 					return;
@@ -659,14 +478,14 @@ import {mapState, mapMutations} from 'vuex';
 				this.sendMsg(msg,'text');
 				this.textMsg = '';//清空输入框
 				// debugger
-			    this.$JIM.sendSingleMsg({
+			    this.JIM.sendSingleMsg({
 					   'target_username' : this.acrossUser,
 					   'target_nickname' : this.targetNickname,
 					   'content' : content,
 					   'appkey' : this.authPayload.appkey,
 					   'nead_receipt':true
 					}).onSuccess(function(data) {
-						console.log('success:' + JSON.stringify(data));
+						console.log('sed text is success:' + JSON.stringify(data));
 					}).onFail(function(data) {
 						console.log('error:' + JSON.stringify(data));
 				});
@@ -693,29 +512,40 @@ import {mapState, mapMutations} from 'vuex';
 				return '<div style="display: flex;align-items: center;word-wrap:break-word;">'+replacedStr+'</div>';
 			},
 			// 发送消息
-			sendMsg(content,type){
+			sendMsg(content, type){
 				//实际应用中，此处应该提交长连接，模板仅做本地处理。
 				var nowDate = new Date();
-				let lastid
-				if (this.msgList.length > 0) {
-					lastid = this.msgList[this.msgList.length-1].msg.id;
-					lastid++;
-				} else {
-					lastid = 1
+				var date = nowDate.getTime();
+				let msg = {}
+				switch (type) {
+					case 'text': // 文字
+					    msg = {content : {msg_body : {text: content.text},msg_type: type}, msg_type: 6, ctime_ms: date}
+						break;
+					case 'voice': // 语音
+					    msg = {content : {msg_body : {},msg_type: type},msg_type: 6, ctime_ms: date}
+						break; // 图片
+					case 'image':
+						this.setPicSize(content);
+						msg = {content : {msg_body : {media_id: content.url, width : content.width, height : content.height}, 
+						msg_type: type}, msg_type: 6, ctime_ms: date}
+						break;
 				}
-				let msg = {type:'user',msg:{id:lastid,time:nowDate.getHours()+":"+nowDate.getMinutes(),
-				  type:type,userinfo:{uid:0,username:this.userInfo.nickname,face:"/static/chat-img/face.jpg"},
-				  content:content}}
 				// 发送消息
 				this.screenMsg(msg);
-				// 定时器模拟对方回复,三秒
-				// setTimeout(()=>{
-				// 	lastid = this.msgList[this.msgList.length-1].msg.id;
-				// 	lastid++;
-				// 	msg = {type:'user',msg:{id:lastid,time:nowDate.getHours()+":"+nowDate.getMinutes(),type:type,userinfo:{uid:1,username:"售后客服008",face:"/static/chat-img/im/face/face_2.jpg"},content:content}}
-				// 	// 本地模拟发送消息
-				// 	this.screenMsg(msg);
-				// },3000)
+				// 保存到本地
+				if (this.localMsgList) { // 判断消息是否存在
+					this.localMsgList.push(msg)
+					uni.setStorage({//缓存用户登陆状态
+					    key: this.acrossUser,  
+					    data: this.localMsgList
+					})
+				} else { // 初始化聊天记录缓存
+					// 消息记录保存到本地
+					uni.setStorage({//缓存用户登陆状态
+					    key: this.acrossUser,  
+					    data: this.msgList  
+					})
+				}
 			},
 			// 添加文字消息到列表
 			addTextMsg(msg){
@@ -727,9 +557,24 @@ import {mapState, mapMutations} from 'vuex';
 			},
 			// 添加图片消息到列表
 			addImgMsg(msg){
-				msg.msg.content = this.setPicSize(msg.msg.content);
-				this.msgImgList.push(msg.msg.content.url);
-				this.msgList.push(msg);
+				debugger
+				if (msg.content.msg_type === 3) {//对方用户的信息
+					this.JIM.getResource({
+					  'media_id' : msg.content.msg_body.media_id,
+					}).onSuccess( data => {
+					  //data.code 返回码
+					  //data.message 描述
+					  this.setPicSize(msg.content.msg_body);
+					  this.msgImgList.push(msg.content.msg_body.media_id);
+					  this.msgList.push(msg);
+					}).onFail(function(data) {
+					  data.code // 返回码
+					  //data.message 描述
+					});
+				} else { // 当前用户的图片信息
+					this.msgImgList.push(msg.content.msg_body.media_id);
+					this.msgList.push(msg);
+				}
 			},
 			addRedEnvelopeMsg(msg){
 				this.msgList.push(msg);
@@ -742,69 +587,11 @@ import {mapState, mapMutations} from 'vuex';
 			addSystemRedEnvelopeMsg(msg){
 				this.msgList.push(msg);
 			},
-			// 打开红包
-			openRedEnvelope(msg,index){
-				let rid = msg.content.rid;
-				uni.showLoading({
-					title:'加载中...'
-				});
-				console.log("index: " + index);
-				//模拟请求服务器效果
-				setTimeout(()=>{
-					//加载数据
-					if(rid==0){
-						this.redenvelopeData={
-							rid:0,	//红包ID
-							from:"大黑哥",
-							face:"/static/chat-img/im/face/face.jpg",
-							blessing:"恭喜发财，大吉大利",
-							money:"已领完"
-						}
-					}else{
-						this.redenvelopeData={
-							rid:1,	//红包ID
-							from:"售后客服008",
-							face:"/static/chat-img/im/face/face_2.jpg",
-							blessing:"恭喜发财",
-							money:"0.01"
-						}
-						if(!msg.content.isReceived){
-							// {type:"system",msg:{id:8,type:"redEnvelope",content:{text:"你领取了售后客服008的红包"}}},
-							this.sendSystemMsg({text:"你领取了"+(msg.userinfo.uid==this.myuid?"自己":msg.userinfo.username)+"的红包"},'redEnvelope');
-							console.log("this.msgList[index]: " + JSON.stringify(this.msgList[index]));
-							this.msgList[index].msg.content.isReceived = true;
-						}
-					}
-					uni.hideLoading();
-					this.windowsState = 'show';
-					
-				},200)
-				
-			},
-			// 关闭红包弹窗
-			closeRedEnvelope(){
-				this.windowsState = 'hide';
-				setTimeout(()=>{
-					this.windowsState = '';
-				},200)
-			},
-			sendSystemMsg(content,type){
-				let lastid = this.msgList[this.msgList.length-1].msg.id;
-				lastid++;
-				let row = {type:"system",msg:{id:lastid,type:type,content:content}};
-				this.screenMsg(row)
-			},
-			//领取详情
-			toDetails(rid){
-				uni.navigateTo({
-					url:'/pages/chat/details='+rid
-				})
-			},
 			// 预览图片
 			showPic(msg){
 				uni.previewImage({
 					indicator:"none",
-					current:msg.content.url,
+					current:msg.msg_body.media_id,
 					urls: this.msgImgList
 				});
 			},
@@ -885,18 +672,16 @@ import {mapState, mapMutations} from 'vuex';
 					this.sendMsg(msg,'voice');
 					// debugger
 					// 发送语音
-					this.$JIM.sendSingleFile({
+					this.JIM.sendSingleFile({
 					            'file' : this.getFile(e.tempFilePath),
 								'target_username' : this.acrossUser,
 								'target_nickname' : this.targetNickname,
 								'appkey' : this.authPayload.appkey,
-								'extras': {'type':'voice','length':msg.length},
+								'extras': {'type':'voice','length': msg.length},
 								'nead_receipt':true
 					        }).onSuccess(function(data) {
-								debugger
-					            console.log('success:' + JSON.stringify(data));
+					            console.log('send voice is success:' + JSON.stringify(data));
 					        }).onFail(function(data) {
-								debugger
 					            console.log('error:' + JSON.stringify(data));
 					        });
 				}else{
@@ -933,6 +718,26 @@ import {mapState, mapMutations} from 'vuex';
 				var offset = (pageNo - 1) * pageSize;
 				return (offset + pageSize >= array.length) ? array.slice(offset, array.length) 
 				: array.slice(offset, offset + pageSize);
+			},
+			// 解析日期
+			parsingDate(dateStr) {
+				return this.$formatDate.timestampToTime(dateStr);
+			},
+			getImageResource(media_id) {
+			  var url = ""
+			  debugger
+			  this.JIM.getResource({
+						'media_id' : media_id,
+			  }).onSuccess(function(data) {
+				  debugger
+				  //data.code 返回码
+				  //data.message 描述
+				  url = data.url // 资源临时访问路径，具体超时时间expire time会包含在url中
+			  }).onFail(function(data) {
+				  //data.code 返回码
+				  //data.message 描述
+			  });
+			  return url;
 			}
 		}
 	}

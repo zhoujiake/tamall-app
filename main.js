@@ -1,6 +1,9 @@
 import Vue from 'vue'
+
 import store from './store'
+
 import App from './App'
+
 import VueCookie from 'vue-cookie'  
 
 import Json from './Json' //测试用数据
@@ -11,7 +14,7 @@ import common from '@/common/common.js'
 
 import formatDate from '@/utils/FormatDate.js'
 
-import jimSdk from '@/lib/jmessage-wxapplet-sdk-1.4.2.min.js'// 引入JMessage
+// import jimSdk from '@/lib/jmessage-wxapplet-sdk-1.4.2.min.js'// 引入JMessage
 /**
  *  因工具函数属于公司资产, 所以直接在Vue实例挂载几个常用的函数
  *  所有测试用数据均存放于根目录json.js
@@ -55,7 +58,7 @@ const prePage = () => {
 const baseUrl = 'http://123.56.109.42:8080/scoa/';
 
 // 初始化JMI
-const JIM = new jimSdk();
+// const JIM = new jimSdk();
 
 Vue.config.productionTip = false 
 Vue.prototype.$fire = new Vue();
@@ -65,7 +68,7 @@ Vue.prototype.$baseUrl = baseUrl;
 Vue.prototype.$http = http;
 Vue.prototype.$common = common;
 Vue.prototype.$formatDate = formatDate;
-Vue.prototype.$JIM = JIM;
+// Vue.prototype.$JIM = JIM;
 Vue.use(VueCookie);
 
 

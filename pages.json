@@ -183,7 +183,7 @@
 	    ,{
             "path" : "pages/notice/notice",
             "style" : {
-				"navigationBarTitleText": "通知"
+				"navigationBarTitleText": "消息"
 			}
         }
         ,{

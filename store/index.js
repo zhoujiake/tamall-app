@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
+import jimSdk from '@/lib/jmessage-wxapplet-sdk-1.4.2.min.js'// 引入JMessage
 
 Vue.use(Vuex)
 
@@ -28,14 +29,26 @@ try {
     // error
 }
 
+// 初始化JMI
+// const JIM = new jimSdk();
+
 const store = new Vuex.Store({
 	state: {
 		hasLogin: false,
+		authPayload: {},
 		userInfo: {},
 		lang : lang,
-		deviceInfo: ''
+		deviceInfo: '',
+	    JIM : new jimSdk(),
+		conversations: [],
+		//播放语音相关参数
+		AUDIO : uni.createInnerAudioContext(),
+		vue : Vue,
+		jimUserName : '12345678',
+		jimNickName : '	客服',
+		chatVueObject : null
 	},
-	mutations: {
+	mutations: { 
 		login(state, provider) {
 			state.hasLogin = true;
 			state.userInfo = provider;
@@ -108,12 +121,206 @@ const store = new Vuex.Store({
 						  selectedIconPath: 'static/ic_mine1.png'
 						})
 					},500)
-					uni
 				}
 			})
 		},
 		setDeviceInfo(state, info){
 			state.deviceInfo = info
+		},
+		// jpush的相关信息
+		getJPushData(state) {
+			// 判断是否初始化
+			if (!state.JIM.isInit()) {
+				uni.request({
+					url: state.vue.prototype.$baseUrl + "jpush-app-Kay", // 调用后台接口，获取初始化相关信息。
+					method: "GET",
+					success: (res) => {
+						if (res.data.resultCode == 200) {
+							state.authPayload = JSON.parse(res.data.message);
+							// 初始化state.JIM
+							state.JIM.init(state.authPayload)
+							  .onSuccess(data => {
+								this.commit('JMIlogin')
+								console.log("JIM init --> "+data)
+							}).onFail(function(data) {
+								console.log("JIM init --> onFail "+data)
+							});
+						} else {
+						}
+					}
+				});
+			} else {
+				this.commit('JMIlogin')
+			}
+		},
+		// JMI注册
+		JMIregister(state) {
+			state.JIM.register({
+					'username' : state.userInfo.loginName,
+					'password' : state.userInfo.password,
+					'nickname' : state.userInfo.nickName
+				}).onSuccess(data => {
+					this.commit('JMIlogin')
+					console.log('success:' + JSON.stringify(data));
+			    }).onFail(function(data) {
+					console.log('error:' + JSON.stringify(data));
+			});
+		},
+		// JMI登录
+		JMIlogin(state) {
+			uni.setStorageSync(state.userInfo.loginName, '[]')
+			state.JIM.login({
+			            'username' : state.userInfo.loginName,
+						'password' : state.userInfo.password
+			        }).onSuccess(data => {
+						console.log('JIM login success');
+						// uni.setStorageSync(state.jimUserName, '')
+						// 获取会话记录
+						this.commit('updateConversation')
+					    state.JIM.onMsgReceive(data => {// 监听消息接收
+							for (let i = 0; i < data.messages.length; i++) {
+								var records = uni.getStorageSync(data.messages[i].from_username)
+								if (records) { // 如果有这个买家的消息记录，则执行。
+									records.push(data.messages[i])
+									// 原保存回去
+									uni.setStorageSync(data.messages[i].from_username, records)
+								} else {
+									let newRecord = []
+									data.messages.forEach((item) => {
+										newRecord.push(item)
+									})
+									// 保存
+									uni.setStorageSync(data.messages[i].from_username, newRecord)
+								}
+								if (state.chatVueObject) { // 正在聊天界面时不执行未读数添加和向铃声代码
+									state.chatVueObject.screenMsg(data.messages[i])
+								} else {
+									state.conversations.forEach( item => {
+										 if (item.username === data.messages[i].from_username) {
+											 let c = item.unread_msg_count + 1
+											 state.JIM.updateConversation({
+											 	 'username' : data.messages[i].from_username,
+											 	 'extras' : {'unreadCount': c}
+											 	});
+										 }
+									})
+									setTimeout(() => {
+										// 更新会话记录
+										this.commit('updateConversation')
+										// 播放提示音
+										this.commit('playVoice')
+									},2000)
+								}
+							}
+					    });
+			            state.JIM.onEventNotification(function(data) {
+			                console.log('event_receive: ' + JSON.stringify(data));
+			            });
+						
+						state.JIM.onSyncConversation(function(data) { //离线消息同步监听
+							try {
+								// 首先判断该聊天记录是否被保存过
+								for (let i = 0; i < data.length; i++) {
+									var records = uni.getStorageSync(data[i].from_username)
+									if (records) { // 如果有这个买家的消息记录，则执行。
+										// 获取已有的消息记录
+										data[i].msgs.forEach((item) => {
+											let flag = false
+											for (let i = 0; i < records.length; i++) {
+												// 如果有重复的消息，则替换数据并跳出改for循环
+												if (records[i].msg_id === item.msg_id) {
+												    records.splice(i,i,item)
+													flag = true
+												}
+											}
+											if (!flag) { // 如果没有重复的则执行添加操作
+												records.push(item)
+											}
+										})
+										// 原保存回去
+										uni.setStorageSync(data[i].from_username, records)
+									} else {
+										var newRecord = []
+										data[i].msgs.forEach((item) => {
+											newRecord.push(item)
+										})
+										uni.setStorageSync(data[i].from_username, newRecord)
+									}
+									// 重置当前消息的未读数到extras中（自定义）
+									state.JIM.getConversation().onSuccess(data2 => {
+										data2.conversations.forEach( item => {
+											if (item.username === data[i].from_username) {
+												 let c = item.unread_msg_count + 1
+												 state.JIM.updateConversation({
+													 'username' : data[i].from_username,
+													 'extras' : {'unreadCount': c}
+												 });
+											}
+										})
+									}).onFail(function(data) {
+									})
+								}
+							} catch (e) {
+								console.log("聊天记录处理异常")
+							}
+						});
+			           state.JIM.onUserInfUpdate(function(data) {
+			                console.log('onUserInfUpdate : ' + JSON.stringify(data));
+			            });
+				 
+				        state.JIM.onSyncEvent(function(data) {
+			                console.log('onSyncEvent : ' + JSON.stringify(data));
+			            });
+						
+						state.JIM.onMsgReceiptChange(function(data){
+						    console.log('onMsgReceiptChange : ' + JSON.stringify(data));
+						});
+						
+						state.JIM.onSyncMsgReceipt(function(data){
+						    console.log('onSyncMsgReceipt : ' + JSON.stringify(data));
+						});
+						
+						state.JIM.onMutiUnreadMsgUpdate(function(data){
+						    console.log('onConversationUpdate : ' + JSON.stringify(data));
+						});
+						
+					    state.JIM.onTransMsgRec(function(data){
+						    console.log('onTransMsgRec : ' + JSON.stringify(data));
+						});
+						
+						state.JIM.onRoomMsg (function(data){
+						    console.log('onRoomMsg  : ' + JSON.stringify(data));
+						});
+			        }).onFail(data => {
+						this.commit('JMIregister')
+			            console.log('error:' + JSON.stringify(data));
+			            console.log('timeout:' + JSON.stringify(data));
+			        });
+		},
+		// 未读数更新
+		updateConversation(state) {
+			state.JIM.getConversation().onSuccess(data => {
+				  state.conversations = []
+				  data.conversations.forEach(item=>{ // 会话列表，属性如下示例
+					if (state.jimUserName === item.username) { // 处理卖家的会话记录以为，其他都过滤
+					  // 单聊会话, 调用则成功，无回调函数
+						  state.JIM.updateConversation({
+							 'username' : item.username,
+							 'extras' : {'unreadCount':item.unread_msg_count}
+							});
+						state.conversations.push(item);
+					}
+				  })
+			 }).onFail(function(data) {
+		     })
+		},
+		// 播放语音
+		playVoice(state){
+			state.AUDIO.src = '/static/voice/838412.mp3';
+			state.AUDIO.play();
+		},
+		setChatVueObject(state, object) {
+			state.chatVueObject = object
 		}
 	},
 	actions: {

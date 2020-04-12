@@ -228,6 +228,10 @@ import {mapState, mapMutations} from 'vuex';
 		  this.loadRecommendGoodsesList(); // 加载推荐商品数据
 		  this.topImageUrl = 'http://39.107.231.238:8080/upload/indexImage/212221212.jpg'
 		},
+		onUnload() {
+			console.log("JIM loginOut ----->>")
+			this.JIM.loginOut()
+		},
 		onReady() {
 			// 获取地理位置信息
 			uni.getLocation({
@@ -249,6 +253,7 @@ import {mapState, mapMutations} from 'vuex';
 			var userinfo = uni.getStorageSync("userInfo")
 			if (userinfo) { // 默认登录
 				this.userLogin(userinfo)
+				this.getJPushData()
 			}
 		},
 		//加载更多
@@ -258,11 +263,12 @@ import {mapState, mapMutations} from 'vuex';
 		computed: {
 			...mapState([
 				'lang',
-				'deviceInfo'
+				'deviceInfo',
+				'JIM'
 			])
 		},
 		methods: {
-			...mapMutations(['setDeviceInfo', 'login']),
+			...mapMutations(['login','setDeviceInfo','getJPushData']),
 			// 登录
 			userLogin(userInfo) {
 				var httpUrl = '';
@@ -286,8 +292,6 @@ import {mapState, mapMutations} from 'vuex';
 						if (res.data.resultCode == 200) {
 							// debugger
 							this.login(userInfo);
-							// 初始化JIM
-							this.getJPushData(userInfo);
 						} else {
 						}
 					}
@@ -406,106 +410,8 @@ import {mapState, mapMutations} from 'vuex';
 				uni.navigateTo({
 					url: `/pages/product/list?tid=${tid}`
 				})
-			},
-			// jpush的相关信息
-			getJPushData(userInfo) {
-				// 判断是否登录
-				if (!this.$JIM.isLogin()) {
-					// 判断是否初始化
-					if (!this.$JIM.isInit()) {
-						uni.request({
-							url: this.$baseUrl + "jpush-app-Kay", // 调用后台接口，获取初始化相关信息。
-							method: "GET",
-							success: (res) => {
-								if (res.data.resultCode == 200) {
-									//debugger
-									console.log(res.data.message)
-								    this.authPayload = JSON.parse(res.data.message);
-									// 初始化this.$JIM
-									this.$JIM.init(this.authPayload)
-									  .onSuccess(data => {
-										this.JMIlogin(userInfo)// 登录
-									  	console.log("JIM init --> "+data)
-									  }).onFail(function(data) {
-									  	console.log("JIM init --> "+data)
-								    });
-								} else {
-								}
-							}
-						});
-					} else {
-						this.JMIlogin()// 登录
-					}
-				}
-			},
-			// JMI注册
-			JMIregister(userInfo){
-				this.$JIM.register({
-						'username' : userInfo.loginName,
-						'password': userInfo.password,
-						'nickname' : userInfo.nickName
-					}).onSuccess(data => {
-						this.JMIlogin(userInfo)
-						console.log('success:' + JSON.stringify(data));
-				    }).onFail(function(data) {
-						console.log('error:' + JSON.stringify(data))
-				});
-			},
-			// JMI登录
-			JMIlogin(userInfo){	
-				this.$JIM.login({
-				            'username' : userInfo.loginName,
-							'password': userInfo.password,
-				        }).onSuccess(data => {
-				            console.log('success:' + JSON.stringify(data));
-						    this.$JIM.onMsgReceive(function(data) {// 监听消息接收
-						    	// debugger
-						    	data = JSON.stringify(data);
-						    	console.log('1msg_receive:' + data);
-						    });
-				            this.$JIM.onEventNotification(function(data) {
-				                console.log('event_receive: ' + JSON.stringify(data));
-				            });
-							this.$JIM.onSyncConversation(function(data) { //离线消息同步监听
-				                console.log(data);
-				            });
-							
-				           this.$JIM.onUserInfUpdate(function(data) {
-				                console.log('onUserInfUpdate : ' + JSON.stringify(data));
-				            });
-					 
-					        this.$JIM.onSyncEvent(function(data) {
-				                console.log('onSyncEvent : ' + JSON.stringify(data));
-				            });
-							
-							this.$JIM.onMsgReceiptChange(function(data){
-							    console.log('onMsgReceiptChange : ' + JSON.stringify(data));
-							});
-							
-							this.$JIM.onSyncMsgReceipt(function(data){
-							    console.log('onSyncMsgReceipt : ' + JSON.stringify(data));
-							});
-							
-							this.$JIM.onMutiUnreadMsgUpdate(function(data){
-							    console.log('onConversationUpdate : ' + JSON.stringify(data));
-							});
-							
-						    this.$JIM.onTransMsgRec(function(data){
-							    console.log('onTransMsgRec : ' + JSON.stringify(data));
-							});
-							
-							this.$JIM.onRoomMsg (function(data){
-							    console.log('onRoomMsg  : ' + JSON.stringify(data));
-							});
-				        }).onFail(data => {
-							this.JMIregister(userInfo)
-				            console.log('error:' + JSON.stringify(data));
-				        }).onTimeout(function(data) {
-				            console.log('timeout:' + JSON.stringify(data));
-				        });
-			},
+			}
 		},
-	
 		// #ifndef MP
 		// 标题栏input搜索框点击
 		onNavigationBarSearchInputClicked: async function(e) {

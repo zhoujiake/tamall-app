@@ -1,120 +1,117 @@
 <template>
-	<view>
-		<!-- <view class="notice-item">
-			<text class="time">11:30</text>
-			<view class="content">
-				<text class="title">新品上市，全场满199减50</text>
-				<view class="img-wrapper">
-					<image class="pic" src="https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1556465765776&di=57bb5ff70dc4f67dcdb856e5d123c9e7&imgtype=0&src=http%3A%2F%2Fimg.zcool.cn%2Fcommunity%2F01fd015aa4d95fa801206d96069229.jpg%401280w_1l_2o_100sh.jpg"></image>
-				</view>
-				<text class="introduce">
-					虽然做了一件好事，但很有可能因此招来他人的无端猜测，例如被质疑是否藏有其他利己动机等，乃至谴责。即便如此，还是要做好事。
-				</text>
-				<view class="bot b-t">
-					<text>查看详情</text>
-					<text class="more-icon yticon icon-you"></text>
-				</view>
+	<view class="content">
+		<view
+			v-for="(item, index) in conversations" :key="index"
+			class="conversations-item" @click="toRoom(item)">
+			<image class="avatar-img" src="/static/app-icon.png" mode="aspectFill"></image>
+			<view class="conversations-conten">
+				<text class="nickname">{{item.nickName}}</text>
+				<text class="date">{{parsingDate(item.mtime)}}</text>
+				<text class="unread" v-show="item.extras.unreadCount > 0">{{item.extras.unreadCount}}</text>
 			</view>
-		</view> -->
+		</view>
 	</view>
 </template>
 
 <script>
-	export default {
-		data() {
-			return {
-
+	import {mapState, mapMutations} from 'vuex';  
+		export default {
+			data() {
+				return {
+				};
+			},
+			onReady() {
+			},
+			onLoad() {
+			},
+			onShow() {
+				if (this.JIM.isLogin()) {
+					this.updateConversation()
+				}
+			},
+			onBackPress() {
+			},
+			computed: {
+				...mapState([
+					'lang',
+					'userInfo',
+					'jimUserName',
+					'jimNickName',
+					'conversations',
+					'JIM'])
+			},
+			methods: {
+				...mapMutations(['login','updateConversation','getJPushData']),
+				parsingDate(timeLong) {
+					return this.$formatDate.timestampToTime(timeLong);
+				},
+				toRoom(item) {
+					try{
+						this.JIM.resetUnreadCount({'username' : this.jimUserName}); // 该用户的消息未读数设置为空
+						this.JIM.updateConversation({
+						 'username' : this.jimUserName,
+						 'extras' : {'unreadCount' : 0}
+						});
+						uni.navigateTo({ // 进入聊天界面
+							url:`/pages/chat/chat?username=${this.jimUserName}&avatar=${''}&nickName=${this.jimNickName}`
+						})
+					}catch(e){
+						this.getJPushData()
+					}
+				}
 			}
-		},
-		methods: {
-
 		}
-	}
 </script>
 
-<style lang='scss'>
-	page {
-		background-color: #f7f7f7;
-		padding-bottom: 30upx;
-	}
-
-	.notice-item {
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-	}
-
-	.time {
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		height: 80upx;
-		padding-top: 10upx;
-		font-size: 26upx;
-		color: #7d7d7d;
-	}
-
+<style lang="scss">
 	.content {
-		width: 710upx;
-		padding: 0 24upx;
-		background-color: #fff;
-		border-radius: 4upx;
-	}
-
-	.title {
-		display: flex;
-		align-items: center;
-		height: 90upx;
-		font-size: 32upx;
-		color: #303133;
-	}
-
-	.img-wrapper {
-		width: 100%;
-		height: 260upx;
-		position: relative;
-	}
-
-	.pic {
-		display: block;
 		width: 100%;
 		height: 100%;
-		border-radius: 6upx;
-	}
-
-	.cover {
-		display: flex;
-		justify-content: center;
-		align-items: center;
-		position: absolute;
-		left: 0;
-		top: 0;
-		width: 100%;
-		height: 100%;
-		background-color: rgba(0, 0, 0, .5);
-		font-size: 36upx;
-		color: #fff;
-	}
-
-	.introduce {
-		display: inline-block;
-		padding: 16upx 0;
-		font-size: 28upx;
-		color: #606266;
-		line-height: 38upx;
-	}
-
-	.bot {
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		height: 80upx;
-		font-size: 24upx;
-		color: #707070;
-		position: relative;
-	}
-
-	.more-icon {
-		font-size: 32upx;
+		
+		.conversations-item {
+			display: flex;
+			flex-direction: row;
+			align-items: center;
+			width: 100%;
+			height: 160upx;
+			background-color: #F1F1F1;
+			margin-top: 8upx;
+			
+			.avatar-img {
+				margin-left: 10upx;
+				margin-right: 10upx;
+				width: 140upx;
+				height: 120upx;
+				background-color: #FFFFFF;
+				border-radius: 10upx;
+				padding: 8upx;
+			}
+			
+			.conversations-conten {
+				height: 160upx;
+				width: 100%;
+				margin-left: 10upx;
+				display: flex;
+				flex-direction: column;
+				justify-content: center;
+				
+				.nickname {
+					font-size: 18px;
+				}
+				.date {
+					font-size: 12px;
+					color: #808080;
+				}
+				.unread {
+					width: 50upx;
+					height: 30upx;
+					font-size: 10px;
+					background-color: #ff0000;
+					border-radius: 30%;
+					color: #FFFFFF;
+					text-align: center;
+				}
+			}
+		}
 	}
 </style>

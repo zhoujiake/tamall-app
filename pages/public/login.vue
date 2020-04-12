@@ -57,7 +57,7 @@
 
 <script>
 	import {
-        mapMutations  
+        mapMutations,mapState 
     } from 'vuex';
 	
 	export default{
@@ -81,9 +81,13 @@
 			this.initPosition()
 			this.initProvider()
 		},
+		computed: {
+			...mapState(['JIM'])
+		},
 		methods: {
 			...mapMutations(['login']),
 			...mapMutations(['setUserInfo']),
+			...mapMutations(['getJPushData']),
 			inputChange(e){
 				const key = e.currentTarget.dataset.key;
 				this[key] = e.detail.value;
@@ -141,6 +145,11 @@
 							 }
 							 this.login(userInfo)
 							 this.$api.msg('登录成功');
+							 debugger
+							 // 登录JIM
+							 if (!this.JIM.isLogin()) {
+								 this.getJPushData()
+							 }
 							 uni.navigateBack();
 						 } else {
 						 	this.$api.msg(res.data.message);
@@ -199,18 +208,8 @@
 										'city': infoRes.userInfo.city,
 										'countySeat': '',
 									}
-								} else if(value == 'qq') {// QQ登录
-									 userInfo = {
-										'nickName': infoRes.userInfo.nickName,
-										'loginName': '',
-										'avatar': infoRes.userInfo.avatarUrl,
-										'openId': infoRes.userInfo.openId,
-										'gender': infoRes.userInfo.gender_type,
-										'loginType': value,
-										'deviceInfo': this.$store.state.deviceInfo,
-										'province': infoRes.userInfo.province,
-										'city': infoRes.userInfo.city,
-										'countySeat': '',
+									if (this.JIM.isLogin()) {
+										 this.getJPushData()
 									}
 								}
 								this.setUserInfo(userInfo);

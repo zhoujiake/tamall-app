@@ -129,11 +129,11 @@
 		</view>
 		<!-- 规格-模态层弹窗 -->
 		<view 
-			class="popup spec" 
+			class="popup spec"
 			:class="specClass"
 			@touchmove.stop.prevent="stopPrevent"
 			@click="toggleSpec"
-		>
+			>
 			<!-- 遮罩层 -->
 			<view class="mask"></view>
 			<view class="layer attr-content" @click.stop="stopPrevent">
@@ -219,7 +219,10 @@
 		},
 		computed: {
 			...mapState([
-				'lang'
+				'lang',
+				'jimUserName',
+				'jimNickName',
+				'JIM'
 			])
 		},
 		methods:{
@@ -302,10 +305,20 @@
 				uni.navigateTo({
 				url: '/pages/chat/chat'
 			})},
+			toChatPage() {
+				this.JIM.resetUnreadCount({'username' : this.jimUserName}); // 该用户的消息未读数设置为空
+				this.JIM.updateConversation({
+				 'username' : this.jimUserName,
+				 'extras' : {'unreadCount' : 0}
+				});
+				uni.navigateTo({ // 进入聊天界面
+					url:`/pages/chat/chat?username=${this.jimUserName}&avatar=${""}&nickName=${this.jimNickName}`
+				})
+			},
 			addShopCart(isBuyAcation) {
 				var data = {
-					'goodsId': this.goods.goodsId, 
-				    'goodsCount': 1
+						'goodsId': this.goods.goodsId, 
+						'goodsCount': 1
 					}
 				// 登录请求
 				uni.request({

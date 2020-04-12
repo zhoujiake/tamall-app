@@ -9,7 +9,8 @@
 	export default {
 		computed: {
 			...mapState([
-				'lang'
+				'lang',
+				'JIM'
 			])
 		},
 		methods: {
