@@ -129,6 +129,8 @@ const store = new Vuex.Store({
 		},
 		// jpush的相关信息
 		getJPushData(state) {
+			state.JIM = null
+			state.JIM = new jimSdk()
 			// 判断是否初始化
 			if (!state.JIM.isInit()) {
 				uni.request({
@@ -139,7 +141,7 @@ const store = new Vuex.Store({
 							state.authPayload = JSON.parse(res.data.message);
 							// 初始化state.JIM
 							state.JIM.init(state.authPayload)
-							  .onSuccess(data => {
+						    .onSuccess(data => {
 								this.commit('JMIlogin')
 								console.log("JIM init --> "+data)
 							}).onFail(function(data) {
@@ -179,37 +181,93 @@ const store = new Vuex.Store({
 						this.commit('updateConversation')
 					    state.JIM.onMsgReceive(data => {// 监听消息接收
 							for (let i = 0; i < data.messages.length; i++) {
-								var records = uni.getStorageSync(data.messages[i].from_username)
-								if (records) { // 如果有这个买家的消息记录，则执行。
-									records.push(data.messages[i])
-									// 原保存回去
-									uni.setStorageSync(data.messages[i].from_username, records)
+								if (data.messages[i].content.msg_type === 'image') {
+									state.JIM.getResource({
+									  'media_id' : data.messages[i].content.msg_body.media_id
+									}).onSuccess( data2 => {
+										// 下载文件
+										uni.downloadFile({
+										  url: data2.url, //仅为示例，并非真实的资源
+										  success: res => {
+											  if (res.statusCode === 200) {
+												uni.saveFile({
+													tempFilePath: res.tempFilePath,
+													success: (res) => {
+														data.messages[i].content.msg_body.media_id = res.savedFilePath
+														var records = uni.getStorageSync(data.messages[i].from_username)
+														if (records) { // 如果有这个买家的消息记录，则执行。
+															records.push(data.messages[i])
+															// 原保存回去
+															uni.setStorageSync(data.messages[i].from_username, records)
+														} else {
+															let newRecord = []
+															data.messages.forEach((item) => {
+																newRecord.push(item)
+															})
+															// 保存
+															uni.setStorageSync(data.messages[i].from_username, newRecord)
+														}
+														if (state.chatVueObject) { // 正在聊天界面时不执行未读数添加和向铃声代码
+															state.chatVueObject.screenMsg(data.messages[i])
+														} else {
+															state.conversations.forEach( item => {
+																 if (item.username === data.messages[i].from_username) {
+																	 let c = item.unread_msg_count + 1
+																	 state.JIM.updateConversation({
+																	 	 'username' : data.messages[i].from_username,
+																	 	 'extras' : {'unreadCount': c}
+																	 	});
+																 }
+															})
+															setTimeout(() => {
+																// 更新会话记录
+																this.commit('updateConversation')
+																// 播放提示音
+																this.commit('playVoice')
+															},2000)
+														}
+													}
+												  });
+											  }
+										  }
+										});
+									}).onFail(function(data) {
+									  data.code // 返回码
+									  //data.message 描述
+									});
 								} else {
-									let newRecord = []
-									data.messages.forEach((item) => {
-										newRecord.push(item)
-									})
-									// 保存
-									uni.setStorageSync(data.messages[i].from_username, newRecord)
-								}
-								if (state.chatVueObject) { // 正在聊天界面时不执行未读数添加和向铃声代码
-									state.chatVueObject.screenMsg(data.messages[i])
-								} else {
-									state.conversations.forEach( item => {
-										 if (item.username === data.messages[i].from_username) {
-											 let c = item.unread_msg_count + 1
-											 state.JIM.updateConversation({
-											 	 'username' : data.messages[i].from_username,
-											 	 'extras' : {'unreadCount': c}
-											 	});
-										 }
-									})
-									setTimeout(() => {
-										// 更新会话记录
-										this.commit('updateConversation')
-										// 播放提示音
-										this.commit('playVoice')
-									},2000)
+									var records = uni.getStorageSync(data.messages[i].from_username)
+									if (records) { // 如果有这个买家的消息记录，则执行。
+										records.push(data.messages[i])
+										// 原保存回去
+										uni.setStorageSync(data.messages[i].from_username, records)
+									} else {
+										let newRecord = []
+										data.messages.forEach((item) => {
+											newRecord.push(item)
+										})
+										// 保存
+										uni.setStorageSync(data.messages[i].from_username, newRecord)
+									}
+									if (state.chatVueObject) { // 正在聊天界面时不执行未读数添加和向铃声代码
+										state.chatVueObject.screenMsg(data.messages[i])
+									} else {
+										state.conversations.forEach( item => {
+											 if (item.username === data.messages[i].from_username) {
+												 let c = item.unread_msg_count + 1
+												 state.JIM.updateConversation({
+												 	 'username' : data.messages[i].from_username,
+												 	 'extras' : {'unreadCount': c}
+												 	});
+											 }
+										})
+										setTimeout(() => {
+											// 更新会话记录
+											this.commit('updateConversation')
+											// 播放提示音
+											this.commit('playVoice')
+										},2000)
+									}
 								}
 							}
 					    });

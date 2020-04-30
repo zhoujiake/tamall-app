@@ -1,13 +1,13 @@
 <template>
 	<view class="app">
 		<view class="price-box">
-			<text>支付金额</text>
+			<text>{{lang.payTotoal}}</text>
 			<text class="price">{{amount}}</text>
 		</view>
 
 		<view class="pay-type-list">
 
-			<view class="type-item b-b" @click="changePayType(1)">
+			<view class="type-item b-b">
 				<text class="icon yticon icon-weixinzhifu"></text>
 				<view class="con">
 					<text class="tit">微信支付</text>
@@ -18,7 +18,7 @@
 					</radio>
 				</label>
 			</view>
-			<view class="type-item b-b" @click="changePayType(2)">
+			<view v-show="false" class="type-item b-b" @click="changePayType(2)">
 				<text class="icon yticon icon-alipay"></text>
 				<view class="con">
 					<text class="tit">支付宝支付</text>
@@ -28,7 +28,7 @@
 					</radio>
 				</label>
 			</view>
-			<view class="type-item" @click="changePayType(3)">
+			<view v-show="false" class="type-item" @click="changePayType(3)">
 				<text class="icon yticon icon-erjiye-yucunkuan"></text>
 				<view class="con">
 					<text class="tit">预存款支付</text>
@@ -41,49 +41,145 @@
 			</view>
 		</view>
 		
-		<text class="mix-btn" @click="confirm">确认支付</text>
+		<text class="mix-btn" @click="requestPayment()">{{lang.confirmPay}}</text>
 	</view>
 </template>
 
 <script>
-
+import {mapState, mapMutations} from 'vuex';  
 	export default {
 		data() {
 			return {
 				payType: 1,
 				orderInfo: {},
 				orderNo: 0,
-				amount: 0
+				amount: 0,
+				payObject: {
+					orderNo: '',
+					totalFee: 0
+				}
 			};
 		},
 		computed: {
-		
+			...mapState([
+				'lang'
+			])
 		},
 		onLoad(options) {
 			this.orderNo = options.orderNo;
 			this.amount = options.amount;
+			// 标题文字
+			var title = this.lang.payment;
+			setTimeout(() => {
+				uni.setNavigationBarTitle({
+					title: title
+				});
+			},300)
+			/* uni.getProvider({
+			    service: "payment",
+			    success: (e) => {
+			        console.log("payment success:" + JSON.stringify(e));
+			        let providerList = [];
+			        e.provider.map((value) => {
+			            switch (value) {
+			                case 'wxpay':
+			                    providerList.push({
+			                        name: '微信',
+			                        id: value,
+			                        loading: false
+			                    });
+			                    break;
+			                default:
+			                    break;
+			            }
+			        })
+			        this.providerList = providerList;
+			    },
+			    fail: (e) => {
+			        console.log("获取支付通道失败：", e);
+			    }
+			}); */
 		},
 		methods: {
-			//选择支付方式
-			changePayType(type) {
-				this.payType = type;
+			async requestPayment() {
+			    let orderInfo = await this.getOrderInfo(this.orderNo);
+			    console.log("得到订单信息", orderInfo);
+			    if (orderInfo.statusCode !== 200) {
+			        console.log("获得订单信息失败", orderInfo);
+			        uni.showModal({
+			            content: "获得订单信息失败",
+			            showCancel: false
+			        })
+			        return;
+			    }
+				debugger
+			    uni.requestPayment({
+			        provider: 'wxpay',
+			        orderInfo: orderInfo.data.data,
+			        success: (e) => {
+						// 查询支付结果来判断，是否支付成功\
+						this.payObject.orderNo = this.orderNo
+						uni.request({
+						    url: this.$baseUrl + '/wxOrderQuery',
+							method: "POST",
+							data: this.payObject,
+							header: {
+								  'content-type': 'application/json' //自定义请求头信息
+						    },
+						    success: (result) => {
+								uni.showToast({
+								    title: "支付成功！"
+								})
+								uni.redirectTo({
+									url: '/pages/money/paySuccess'
+								})
+						    },
+						    fail: (e) => {
+								console.log("fail ", e);
+								uni.showToast({
+								    title: "支付异常！"
+								})
+						    }
+						})
+			            
+			        },
+			        fail: (e) => {
+						console.log("fail ", e);
+						uni.showToast({
+						    title: "取消支付"
+						})
+			            console.log("fail", e);
+			           /* uni.showModal({
+			                content: "支付失败,原因为: " + e.errMsg,
+			                showCancel: false
+			            }) */
+			        },
+			        complete: () => {
+			            // this.providerList[0].loading = false;
+			        }
+			    })
 			},
-			//确认支付
-			confirm: async function() {
-				// 取消订单
-				uni.request({
-					url: this.$baseUrl + "paySuccess?orderNo="+ this.orderNo +"&payType=" + this.payType,
-					method: "GET",
-					success: (res) => {
-						if (res.data.resultCode == 200) {
-							uni.redirectTo({
-								url: '/pages/money/paySuccess'
-							})
-						} else {
-						}
-					}
-				});
-				
+			// 获取与支付订单信息
+			getOrderInfo(e) {
+				this.payObject.orderNo = this.orderNo
+				this.payObject.totalFee = this.amount * 100;
+			    let url = this.$baseUrl + '/wxOrderInfo';
+			    return new Promise((res) => {
+			        uni.request({
+			            url: url,
+						method: "POST",
+						data: this.payObject,
+						header: {
+							  'content-type': 'application/json' //自定义请求头信息
+					    },
+			            success: (result) => {
+			                res(result);
+			            },
+			            fail: (e) => {
+			                res(e);
+			            }
+			        })
+			    })
 			},
 		}
 	}

@@ -29,40 +29,63 @@
 		</view>
 		<!-- 分类 -->
 		<view class="cate-section">
-			<view class="cate-item" @click="navToList(121)">
-				<image src="/static/temp/c3.png"></image>
-				<text>{{lang.household}}</text>
+			<view class="cate-item" @click="navToList(194)">
+				<image src="/static/imgs/book.png"></image>
+				<text>{{lang.book}}</text> <!-- 书籍 -->
 			</view>
-			<view class="cate-item" @click="navToList(116)">
-				<image src="/static/temp/c5.png"></image>
-				<text>{{lang.monkSupplies}}</text>
-			</view>
-			<view class="cate-item" @click="navToList(126)">
-				<image src="/static/temp/c6.png"></image>
-				<text>{{lang.accessories}}</text>
-			</view>
-			<view class="cate-item" @click="navToList(116)">
-				<image src="/static/temp/c7.png"></image>
-				<text>{{lang.thangka}}</text>
+			<view class="cate-item" @click="navToList(222)">
+				<image src="/static/imgs/fozhu.png"></image>
+				<text>{{lang.buddhaBeads}}</text><!-- 佛珠 -->
 			</view> 
-			<view class="cate-item" @click="navToList(143)">
-				<image src="/static/temp/c8.png"></image>
-				<text>{{lang.buddhaSupplies}}</text>
+			<view class="cate-item" @click="navToList(161)">
+				<image src="/static/imgs/zhubao.png" ></image>
+				<text>{{lang.jewellery}}</text><!-- 珠宝 -->
+			</view>
+			<view class="cate-item" @click="navToList(168)">
+				<image src="/static/imgs/heshang-yongpin.png"></image>
+				<text>{{lang.monkSupplies}}</text> <!-- 和尚用品 -->
+			</view>
+			<view class="cate-item" @click="navToList(379)">
+				<image src="/static/imgs/bu.png"></image>
+				<text>{{lang.cloth}}</text> <!-- 布料 -->
+			</view>
+		</view>
+		<!-- 分类 -->
+		<view class="cate-section-second">
+			<view class="cate-item" @click="navToList(153)">
+				<image src="/static/imgs/package.png" ></image>
+				<text>{{lang.packege}}</text><!-- 包 -->
+			</view>
+			<view class="cate-item" @click="navToList(309)">
+				<image src="/static/imgs/gongpin.png"></image>
+				<text>{{lang.tribute}}</text><!-- 贡品 -->
+			</view>
+			<view class="cate-item" @click="navToList(359)">
+				<image src="/static/imgs/xianglian.png"></image>
+				<text>{{lang.necklace}}</text><!-- 饰品 -->
+			</view> 
+			<view class="cate-item" @click="navToList(422)">
+				<image src="/static/imgs/yao.png"></image>
+				<text>{{lang.medicine}}</text><!-- 药品 -->
+			</view>
+			
+			<view class="cate-item" @click="navToList(235)">
+				<image src="/static/imgs/jiaju.png"></image>
+				<text>{{lang.furniture}}</text><!-- 家具 -->
 			</view>
 		</view>
 		
-		<view class="ad-1"><!-- 广告图 -->
+		<view v-show="false" class="ad-1"><!-- 广告图 -->
 			<image class="top-image" :src="topImageUrl" mode="scaleToFill"></image>
 		</view>
-		
 		<!-- 热销商品 -->
 		<view class="f-header m-t">
-			<image src="/static/temp/h1.png"></image>
+			<image src="/static/imgs/hot-things.png"></image>
 			<view class="tit-box">
 				<text class="tit">{{lang.hotGoods}}</text>
 				<text class="tit2">{{lang.hotGoodsTextContent}}</text>
 			</view>
-			<text class="yticon icon-you"></text>
+			<!-- <text class="yticon icon-you"></text> -->
 		</view>
 		<view class="group-section">
 			<swiper class="g-swiper" :duration="500">
@@ -99,12 +122,12 @@
 	
 		<!-- 分类推荐楼层 -->
 		<view class="f-header m-t">
-			<image src="/static/temp/h1.png"></image>
+			<image src="/static/imgs/new-things.png"></image>
 			<view class="tit-box"> <!-- 新品上线 -->
 				<text class="tit">{{lang.newGoodsOnline}}</text>
 				<text class="tit2">{{lang.newGoodsOnlineTextContent}}</text>
 			</view>
-			<text class="yticon icon-you"></text>
+			<!-- <text class="yticon icon-you"></text> -->
 		</view>
 		<view class="hot-floor">
 			<view class="floor-img-box">
@@ -121,9 +144,9 @@
 						<text class="title clamp">{{item.goodsName}}</text>
 						<text class="price">{{lang.moneyFlag + item.sellingPrice}}</text>
 					</view>
-					<view class="more">
-						<text>{{lang.more}}</text>
-					</view>
+					<!-- <view class="more">
+						<text  @click="navToList(153)">{{lang.more}}</text>
+					</view> -->
 				</view>
 			</scroll-view>
 		</view>
@@ -142,13 +165,13 @@
 						<text class="title clamp">{{item.goodsName}}</text>
 						<text class="price">{{lang.moneyFlag + item.sellingPrice}}</text>
 					</view>
-					<view class="more">
+					<!-- <view class="more">
 						<text>{{lang.more}}</text>
-					</view>
+					</view> -->
 				</view>
 			</scroll-view>
 		</view>
-		<view class="hot-floor">
+		<!-- <view class="hot-floor">
 			<view class="floor-img-box">
 				<image class="floor-img" :src="newGoodsImg3" mode="scaleToFill"></image>
 			</view>
@@ -168,16 +191,16 @@
 					</view>
 				</view>
 			</scroll-view>
-		</view>
+		</view> -->
 
 		<!-- 猜你喜欢 -->
 		<view class="f-header m-t">
-			<image src="/static/temp/h1.png"></image>
+			<image src="/static/imgs/recommend-icon.png"></image>
 			<view class="tit-box">
 				<text class="tit">{{lang.recommend}}</text>
 				<text class="tit2">{{lang.recommendTextContent}}</text>
 			</view>
-			<text class="yticon icon-you"></text>
+			<!-- <text class="yticon icon-you"></text> -->
 		</view>
 		
 		<view class="guess-section">
@@ -248,7 +271,6 @@ import {mapState, mapMutations} from 'vuex';
 			    }
 			});
 			this.setDeviceInfo(info)
-			
 			// 检查用户是否已经登录过
 			var userinfo = uni.getStorageSync("userInfo")
 			if (userinfo) { // 默认登录
@@ -273,7 +295,7 @@ import {mapState, mapMutations} from 'vuex';
 			userLogin(userInfo) {
 				var httpUrl = '';
 				var contentType = '';
-				if (userInfo.loginType == "weixin" || userInfo.loginType == "qq") {
+				if (userInfo.loginType == "weixin") {
 					httpUrl = this.$baseUrl + "loginForAppOfOtherPlatform";
 					contentType = 'application/json'
 				} else if (userInfo.loginType == "normal") {
@@ -290,7 +312,6 @@ import {mapState, mapMutations} from 'vuex';
 					method: "POST",
 					success: (res) => {
 						if (res.data.resultCode == 200) {
-							// debugger
 							this.login(userInfo);
 						} else {
 						}
@@ -408,7 +429,7 @@ import {mapState, mapMutations} from 'vuex';
 			},
 			navToList(tid) {
 				uni.navigateTo({
-					url: `/pages/product/list?tid=${tid}`
+					url: `/pages/product/list?tid=${tid}&isForCategoryGoods=1`
 				})
 			}
 		},
@@ -592,6 +613,34 @@ import {mapState, mapMutations} from 'vuex';
 			box-shadow: 4upx 4upx 20upx rgba(250, 67, 106, 0.3);
 		}
 	}
+	/* 分类 */
+	.cate-section-second {
+		display: flex;
+		justify-content: space-around;
+		align-items: center;
+		flex-wrap:wrap;
+		background: #fff;
+		padding-bottom: 22upx;
+		padding-left: 15upx;
+		padding-right: 15upx;
+		.cate-item {
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			font-size: $font-sm + 2upx;
+			color: $font-color-dark;
+		}
+		/* 原图标颜色太深,不想改图了,所以加了透明度 */
+		image {
+			width: 88upx;
+			height: 88upx;
+			margin-bottom: 14upx;
+			border-radius: 50%;
+			opacity: .7;
+			box-shadow: 4upx 4upx 20upx rgba(250, 67, 106, 0.3);
+		}
+	}
+	
 	.ad-1{
 		width: 100%;
 		height: 210upx;

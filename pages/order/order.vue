@@ -68,7 +68,7 @@
 							<button class="action-btn recom" @click="pay(item)">立即支付</button>
 						</view>
 						
-						<view class="action-box b-t" v-if="item.orderStatus == 1">
+						<view class="action-box b-t" v-if="item.orderStatus == 2">
 							<button class="action-btn" @click="showLogistics(item)">查看物流</button>
 						</view>
 						
@@ -116,7 +116,7 @@
 					},
 					{
 						state: 3,
-						text: '待评价',
+						text: '已收货',
 						loadingType: 'more',
 						orderList: []
 					},
@@ -170,11 +170,11 @@
 				}
 				navItem.loadingType = 'loading';
 				var url = '';
-				if (this.tabCurrentIndex === 1) { // 代付款
+				if (this.tabCurrentIndex === 1) { // 待付款
 					url = this.$baseUrl + "ordersForApp?page=" + this.pageNum + "&orderStatus=" + 0;
-				} else if (this.tabCurrentIndex === 2) { // 待收货
+				} else if (this.tabCurrentIndex === 2) { // 待收货/已配货/已出库
 					url = this.$baseUrl + "ordersForApp?page=" + this.pageNum + "&orderStatus=" + 1;
-				} else if (this.tabCurrentIndex === 3) { // 待评价
+				} else if (this.tabCurrentIndex === 3) { // 待收货
 					url = this.$baseUrl + "ordersForApp?page=" + this.pageNum + "&orderStatus=" + 4;
 				}  else if (this.tabCurrentIndex === 4) { // 售后
 					url = this.$baseUrl + "ordersForApp?page=" + this.pageNum + "&orderStatus=" + 4;
@@ -270,7 +270,7 @@
 			// 查看物流
 			showLogistics(item) {
 				uni.navigateTo({
-					url: '/pages/order/orderStep'
+					url: `/pages/order/orderStep?orderId=${item.orderId}&userAddress=${item.userAddress}`
 				});
 			},
 			//订单状态文字和颜色

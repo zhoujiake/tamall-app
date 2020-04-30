@@ -14,7 +14,7 @@
 					<text :class="{active: priceOrder === 2 && filterIndex === 2}" class="yticon icon-shang xia"></text>
 				</view>
 			</view>
-			<text class="cate-item yticon icon-fenlei1" @click="toggleCateMask('show')"></text>
+			<!-- <text class="cate-item yticon icon-fenlei1" @click="toggleCateMask('show')"></text> -->
 		</view>
 		<view class="goods-list">
 			<view 
@@ -74,7 +74,8 @@
 				priceOrder: 0, //1 价格从低到高 2价格从高到低
 				cateList: [],
 				goodsList: [],
-				keyWord: ''
+				keyWord: '',
+				isForCategoryGoods : "0" // 0代表否，1代表是
 			};
 		},
 		computed:{
@@ -91,6 +92,9 @@
 			}
 			if(options.keyWord) {
 				this.keyWord = options.keyWord
+			}
+			if(options.isForCategoryGoods) {
+				this.isForCategoryGoods = options.isForCategoryGoods
 			}
 			// this.loadCateList(options.fid, options.sid);
 			this.loadData();
@@ -125,7 +129,7 @@
 				})
 				this.cateList = cateList;
 			},
-			//加载商品 ，带下拉刷新和上滑加载
+			//加载商品，带下拉刷新和上滑加载
 			async loadData(type='add', loading) {
 				//没有更多直接返回
 				if(type === 'add'){
@@ -136,10 +140,17 @@
 				}else{
 					this.loadingType = 'more'
 				}
+				let url = "";
+				if (this.isForCategoryGoods === "1") { // 根据获取三级分类直接关联的商品 
+					url = this.$baseUrl + 'goodsCategoryByFirstLevelId?&goodsCategoryId='
+						+ this.cateId + '&orderBy=' + this.orderBy + '&page=' + this.pageNum
+				} else { // 根据获取三级分类直接关联的商品
+					url = this.$baseUrl + 'searchForApp?keyword=' + this.keyWord + '&goodsCategoryId='
+							+ this.cateId + '&orderBy=' + this.orderBy + '&page=' + this.pageNum
+				}
 				// 获取分类商品列表
 				uni.request({
-					url: this.$baseUrl + 'searchForApp?keyword=' + this.keyWord + '&goodsCategoryId=' 
-					+ this.cateId + '&orderBy=' + this.orderBy + '&page=' + this.pageNum, 
+					url: url,
 					method: "GET",
 					success: (res) => {
 						if (res.data.resultCode == 200 && res.data.data.list.length > 0) {

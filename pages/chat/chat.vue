@@ -281,18 +281,8 @@ import {mapState, mapMutations} from 'vuex';
 					// 获取消息中的图片,并处理显示尺寸
 					for(let i=0;i<list.length;i++){
 						if(list[i].content.msg_type=='image'){
-							this.JIM.getResource({
-							  'media_id' : list[i].content.msg_body.media_id,
-							}).onSuccess( data => {
-							  //data.code 返回码
-							  //data.message 描述
 							  this.setPicSize(list[i].content.msg_body);
-							  list[i].content.msg_body.media_id = data.url // 资源临时访问路径，具体超时时间expire time会包含在url中
 							  this.msgImgList.unshift(list[i].content.msg_body.media_id);
-							}).onFail(function(data) {
-							  data.code // 返回码
-							  //data.message 描述
-							});
 						}
 						// list[i].msg.id = Math.floor(Math.random()*1000+1);
 						this.msgList.unshift(list[i]);
@@ -308,8 +298,7 @@ import {mapState, mapMutations} from 'vuex';
 				},1000)
 			},
 			// 加载初始页面消息
-			getMsgList(username){
-				debugger
+			getMsgList(username) {
 				let wellcomeMsg = {content:{msg_type:3,msg_body:{text:"暂无消息"}}}
 				// 获取本地消息记录
 				this.localMsgList = uni.getStorageSync(username)
@@ -336,18 +325,10 @@ import {mapState, mapMutations} from 'vuex';
 				// 获取消息中的图片,并处理显示尺寸
 				for(let i=0;i<list.length;i++) {
 					if(list[i].content.msg_type == 'image') {
-						this.JIM.getResource({
-						  'media_id' : list[i].content.msg_body.media_id,
-						}).onSuccess( data => {
 						  //data.code 返回码
 						  //data.message 描述
 						  this.setPicSize(list[i].content.msg_body);
-						  list[i].content.msg_body.media_id = data.url // 资源临时访问路径，具体超时时间expire time会包含在url中
 						  this.msgImgList.unshift(list[i].content.msg_body.media_id);
-						}).onFail(function(data) {
-						  //data.code 返回码
-						  data.message // 描述
-						});
 					}
 					this.msgList.unshift(list[i]);
 					msgIds.push(list[i].msg_id);
@@ -366,7 +347,7 @@ import {mapState, mapMutations} from 'vuex';
 				});
 			},
 			//处理图片尺寸，如果不处理宽高，新进入页面加载图片时候会闪
-			setPicSize(content){
+			setPicSize(content) {
 				// 让图片最长边等于设置的最大长度，短边等比例缩小，图片控件真实改变，区别于aspectFit方式。
 				let maxW = uni.upx2px(350);//350是定义消息图片最大宽度
 				let maxH = uni.upx2px(350);//350是定义消息图片最大高度
@@ -557,24 +538,9 @@ import {mapState, mapMutations} from 'vuex';
 			},
 			// 添加图片消息到列表
 			addImgMsg(msg){
-				debugger
-				if (msg.content.msg_type === 3) {//对方用户的信息
-					this.JIM.getResource({
-					  'media_id' : msg.content.msg_body.media_id,
-					}).onSuccess( data => {
-					  //data.code 返回码
-					  //data.message 描述
-					  this.setPicSize(msg.content.msg_body);
-					  this.msgImgList.push(msg.content.msg_body.media_id);
-					  this.msgList.push(msg);
-					}).onFail(function(data) {
-					  data.code // 返回码
-					  //data.message 描述
-					});
-				} else { // 当前用户的图片信息
-					this.msgImgList.push(msg.content.msg_body.media_id);
-					this.msgList.push(msg);
-				}
+				this.setPicSize(msg.content.msg_body);
+				this.msgImgList.push(msg.content.msg_body.media_id);
+				this.msgList.push(msg);
 			},
 			addRedEnvelopeMsg(msg){
 				this.msgList.push(msg);
@@ -700,7 +666,7 @@ import {mapState, mapMutations} from 'vuex';
 		    getFile(path) {
 				var input = document.getElementById('input')
 				input.type = 'file'  
-				input.onchange = (event) => {  
+				input.onchange = (event) => {
 					console.log(event)  
 				}  
 				this.$refs.input.$el.appendChild(input)  
@@ -722,22 +688,6 @@ import {mapState, mapMutations} from 'vuex';
 			// 解析日期
 			parsingDate(dateStr) {
 				return this.$formatDate.timestampToTime(dateStr);
-			},
-			getImageResource(media_id) {
-			  var url = ""
-			  debugger
-			  this.JIM.getResource({
-						'media_id' : media_id,
-			  }).onSuccess(function(data) {
-				  debugger
-				  //data.code 返回码
-				  //data.message 描述
-				  url = data.url // 资源临时访问路径，具体超时时间expire time会包含在url中
-			  }).onFail(function(data) {
-				  //data.code 返回码
-				  //data.message 描述
-			  });
-			  return url;
 			}
 		}
 	}

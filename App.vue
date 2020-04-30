@@ -50,6 +50,21 @@
 			}
 		},
 		onLaunch: function() {
+			// 获取当前App安装状态(首次安装或者，已经安装)
+			let isInstall = uni.getStorageSync("is_install")
+			// 当判断用户首次安装时执行
+			if (!isInstall) { 
+				setTimeout(function() {
+					uni.navigateTo({
+						url: '/pages/public/login'
+					});
+				}, 2000);
+			}
+			// 保存已安装状态
+			uni.setStorage({
+				key: 'is_install',
+				data: 'installed'
+			});
 			// 设置语言
 			this.setLang()
 		},

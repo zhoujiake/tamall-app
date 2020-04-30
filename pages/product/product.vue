@@ -8,6 +8,7 @@
 							:src="item" 
 							class="loaded" 
 							mode="aspectFill"
+							@tap="showPic(index)"
 						></image>
 					</view>
 				</swiper-item>
@@ -30,7 +31,7 @@
 		</view>
 		
 		<!--  分享 -->
-		<view class="share-section" @click="share">
+		<!-- <view class="share-section" @click="share">
 			<view class="share-icon">
 				<text class="yticon icon-xingxing"></text>
 				 {{lang.integral}}
@@ -41,7 +42,7 @@
 				{{lang.shareNow}}
 				<text class="yticon icon-you"></text>
 			</view>
-		</view>
+		</view> -->
 		
 		<view class="c-list">
 			<view class="c-row b-b">
@@ -195,7 +196,7 @@
 				specList: [
 				],
 				specChildList: [
-				]
+				],
 			};
 		},
 		async onLoad(options) {
@@ -346,6 +347,13 @@
 						 }
 				    }
 				});
+			},
+			showPic(index) {
+				uni.previewImage({
+					indicator:"none",
+					current:index,
+					urls: this.goods.goodsCarouselList
+				});
 			}
 		},
 
@@ -358,7 +366,8 @@
 		padding-bottom: 160upx;
 	}
 	.rich-view img{
-		width: 10px !important;
+		width: 100% !important;
+		height: 100% !important;
 	}
 	
 	.icon-you{

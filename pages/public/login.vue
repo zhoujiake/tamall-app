@@ -1,8 +1,10 @@
 <template>
 	<view class="container">
 		<view class="left-bottom-sign"></view>
-		<view class="back-btn yticon icon-zuojiantou-up" @click="navBack"></view>
 		<view class="right-top-sign"></view>
+		<view class="right-close-button" @click="navBack">
+			<image src="../../static/imgs/close.png" style="width: 40upx; height: 40upx;"></image>
+		</view>
 		<!-- 设置白色背景防止软键盘把下部绝对定位元素顶上来盖住输入框等 -->
 		<view class="wrapper">
 			<view class="left-top-sign">LOGIN</view>
@@ -52,6 +54,7 @@
 		<view class="register-section">
 			还没有账号? <text @tap="toRegist()">马上注册</text>
 		</view>
+		
 	</view>
 </template>
 
@@ -82,7 +85,7 @@
 			this.initProvider()
 		},
 		computed: {
-			...mapState(['JIM'])
+			...mapState(['JIM','deviceInfo','jimUserName'])
 		},
 		methods: {
 			...mapMutations(['login']),
@@ -95,13 +98,13 @@
 			navBack(){
 				uni.navigateBack();
 			},
-			toRegist(){
+			toRegist() {
 				uni.navigateTo({
 					url: '/pages/public/registe'
-					})  
+					})
 			},
 			// 登录接口
-			async toLogin(e) {	
+			async toLogin(e) {
 				if(this.mobile == "") {
 					this.$api.msg('请输入手机号码');
 					return
@@ -138,14 +141,13 @@
 							 	'email': provider.email,
 							 	'openId': provider.openId,
 							 	'loginType': provider.loginType,
-							 	'deviceInfo': this.$store.state.deviceInfo,
+							 	'deviceInfo': this.deviceInfo,
 							 	'province': provider.province,
 							 	'city': provider.city,
 							 	'countySeat': provider.countySeat,
 							 }
 							 this.login(userInfo)
 							 this.$api.msg('登录成功');
-							 debugger
 							 // 登录JIM
 							 if (!this.JIM.isLogin()) {
 								 this.getJPushData()
@@ -158,10 +160,10 @@
 				});
 			},
 			initProvider() { // 获取第三方登录服务
-			    const filters = ['weixin', 'qq'];
+			    const filters = ['weixin'];
 			    uni.getProvider({
 			        service: 'oauth',
-			        success: (res) => {
+			        success: (res) => {	
 			            if (res.provider && res.provider.length) {
 			                for (let i = 0; i < res.provider.length; i++) {
 			                    if (~filters.indexOf(res.provider[i])) {
@@ -190,55 +192,74 @@
 			    uni.login({
 			        provider: value,
 			        success: (res) => {
-			            uni.getUserInfo({
-			                provider: value,
-			                success: (infoRes) => {
-								console.log("wechat user info" + infoRes)
-								var userInfo = {}
-								if (value == 'weixin') { // 微信登录
-									 userInfo = {
-										'nickName': infoRes.userInfo.nickName,
-										'loginName': '',
-										'avatar': infoRes.userInfo.avatarUrl,
-										'openId': infoRes.userInfo.openId,
-										'gender': infoRes.userInfo.gender,
-										'loginType': value,
-										'deviceInfo': this.$store.state.deviceInfo,
-										'province': infoRes.userInfo.province,
-										'city': infoRes.userInfo.city,
-										'countySeat': '',
-									}
-									if (this.JIM.isLogin()) {
-										 this.getJPushData()
-									}
-								}
-								this.setUserInfo(userInfo);
-								// 第三方用户登录 
-								uni.request({
-								    url: this.$baseUrl + "loginForAppOfOtherPlatform", //仅为示例，并非真实接口地址。
-									data: userInfo,
-								    header: {
-										  'content-type': 'application/json' //自定义请求头信息
-									  },
-									method: "POST",
-								    success: (res) => {
-										if (res.data.resultCode == 200) {
-											this.login(userInfo);
-											this.$api.msg('登录成功');
-											uni.navigateBack();
-										} else {
-											this.$api.msg(res.data.message);
+						uni.login({ // 第三方授权登录
+						  provider: value,
+						  success: loginRes => {
+						    console.log(loginRes.authResult);
+							uni.getUserInfo({
+							    provider: value,
+							    success: (infoRes) => {
+									console.log("wechat user info" + infoRes)
+									var userInfo = {}
+									// 微信登录
+									if (value == 'weixin') {
+										 userInfo = {
+											'nickName': infoRes.userInfo.nickName,
+											'loginName': '',
+											'avatar': infoRes.userInfo.avatarUrl,
+											'openId': infoRes.userInfo.openId,
+											'gender': infoRes.userInfo.gender,
+											'loginType': value,
+											'deviceInfo': this.deviceInfo,
+											'province': infoRes.userInfo.province,
+											'city': infoRes.userInfo.city,
+											'countySeat': '',
 										}
-								    }
-								});
-			                }
-			            });
+										var d = this.jimUserName
+										if (this.JIM.isLogin()) {
+											 this.getJPushData()
+										}
+									}
+									// 第三方用户登录 
+									uni.request({
+									    url: this.$baseUrl + "loginForAppOfOtherPlatform", //仅为示例，并非真实接口地址。
+										data: userInfo,
+									    header: {
+											  'content-type': 'application/json' //自定义请求头信息
+										},
+										method: "POST",
+									    success: (res) => {
+											if (res.data.resultCode == 200) {
+												debugger
+												this.login(res.data.data);
+												this.$api.msg('登录成功');
+												uni.navigateBack();
+											} else {
+												this.$api.msg(res.data.message);
+											}
+									    }
+									});
+							    }
+							});
+						  }
+						});
 			        },
 			        fail: (err) => {
 			            console.error('授权登录失败：' + JSON.stringify(err));
 			        }
 			    });
 			},
+			randomString(len) {
+			　　len = len || 32;
+			　　var $chars = 'ABCDEFGHJKMNPQRSTWXYZabcdefhijkmnprstwxyz0123456789';    
+			   /**** 默认去掉了容易混淆的字符oOLl,9gq,Vv,Uu,I1 ****/
+			　　var maxPos = $chars.length;
+			　　var pwd = '';
+			　　for (let i = 0; i < len; i++) {
+			　　　　pwd += $chars.charAt(Math.floor(Math.random() * maxPos));
+			　　}
+			　　return pwd;
+			}
 		},
 	}
 </script>
@@ -254,6 +275,15 @@
 		height: 100vh;
 		overflow: hidden;
 		background: #fff;
+	}
+	.right-close-button{
+		position:absolute;
+		right: 40upx;
+		z-index: 9999;
+		padding-top: var(--status-bar-height);
+		top: 40upx;
+		font-size: 40upx;
+		color: $font-color-dark;
 	}
 	.wrapper{
 		position:relative;

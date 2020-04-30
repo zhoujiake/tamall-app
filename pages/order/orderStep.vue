@@ -1,6 +1,7 @@
 <template>
 	<view class="container">
-		<ali :state="alidata2.state" :datas="alidata2.data" :ways="alidata2.information"></ali>
+		<ali :state="orderTracesData.State" :datas="orderTracesData.Traces" 
+				:ways="orderTracesData.ShipperCode" :userAddress="userAddress"></ali>
 	</view>
 </template>
 
@@ -12,62 +13,73 @@ export default {
 	},
 	data() {
 		return {
-				alidata2: {
-					state: 3,
-					uptime: '2019-05-24 10:58:24',
-					data: [
-						{
-							time: '2019-05-20 16:27:31',
-							remark: '杭州市【杭州西湖区十八部】，公司门口！详情致电17609715305 已签收'
-						},
-						{
-							time: '2019-05-20 14:03:11',
-							remark: '杭州市【杭州西湖区十八部】，【谭德银17609715305】正在派件'
-						},
-						{
-							time: '2019-05-20 10:53:15',
-							remark: '到杭州市【杭州西湖区十八部】'
-						},
-						{
-							time: '2019-05-20 04:22:38',
-							remark: '杭州市【杭州转运营业中心】，正发往【杭州西湖区十八部】'
-						},
-						{
-							time: '2019-05-20 03:30:17',
-							remark: '到杭州市【杭州转运中心】'
-						},
-						{
-							time: '2019-05-19 21:46:27',
-							remark: '苏州市【无锡转运中心】，正发往【杭州转运中心】'
-						},
-						{
-							time: '2019-05-19 21:43:28',
-							remark: '到苏州市【无锡转运中心】'
-						},
-						{
-							time: '2019-05-19 17:11:40',
-							remark: '到南通市【海门】'
-						},
-						{
-							time: '2019-05-19 13:17:56',
-							remark: '南通市【海门】，【金喜露18068137656】已揽收'
-						}
-					],
-					information: {
-						no: '70939995911523',
-						sName: 'HTKY',
-						expName: '百世快递(原汇通)',
-						url: 'http:www.htky365.com',
-						tel: '021-62963636',
-						img: 'https:oss-cn2.apistore.cnexpHTKY.png'
-					}
+				orderTracesData: {
+					State: 0,
+					ShipperCode: '',
+					Reason: '',
+					Traces: [],
 				},
+				candidates: {
+					ZTO:'中通快递',
+					STO:'申通快递',
+					YTO:'圆通速递',
+					YD:'韵达速递',
+					YZPY:'邮政快递包裹',
+					EMS:'EMS',
+					HHTT:'天天快递',
+					JD:'京东快递',
+					UC:'优速快递',
+					DBL:'德邦快递',
+					ZJS:'宅急送',
+					SF:'顺丰速运'
+				},
+				formdata : {
+					orderId : 0,
+				},
+				userAddress : ""
 		};
 	},
-	onLoad() {
+	async onLoad(options) {
+		let orderId = options.orderId;
+		this.formdata.orderId = orderId; 
+		let userAddress = options.userAddress;
+		this.userAddress = userAddress; 
+		this.orderStaces()
 	},
 	methods: {
-		
+		orderStaces() {
+			uni.request({
+			    url: this.$baseUrl + "admin/orders/orderTraces", //仅为示例，并非真实接口地址。
+				data: this.formdata,
+			    header: {
+					  'content-type': 'application/x-www-form-urlencoded' //自定义请求头信息
+				},
+				method: "POST",
+			    success: (res) => {
+					 if (res.data.resultCode == 200) {
+						 this.orderTracesData =  JSON.parse(res.data.message);
+						 const compare = (key) => {
+						   return (obj1, obj2) => {
+						     let value1 = obj1[key]
+						     let value2 = obj2[key]
+						     if (value1 < value2) {
+						       return 1;
+						     } else if (value1 > value2) {
+						       return -1;
+						     } else {
+						       return 0
+						     }
+						   }
+						 }
+						 // 按时间降序
+						 this.orderTracesData.Traces.sort(compare(`AcceptTime`))
+						 debugger
+					 } else {
+					 	// this.$api.msg(res.data.message);
+					 }
+			    }
+			});
+		}
 	}
 };
 </script>

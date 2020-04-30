@@ -2,29 +2,22 @@
 	<view class="ali">
 		<view class="ali_top borders" v-if="state != 3">
 			<text class="ali_top_icon">收</text>
-			<text class="a14">浙江省杭州市西湖区 蒋村街道 紫霞街 110号</text>
+			<text class="a14">{{userAddress}}</text>
 		</view>
 		<!-- ======="state": 0 ,1 ,2====== -->
 		<view class="ali_state">
 			<block v-for="(item,i) in datas" :key="i">
 				<view class="State_Four">
 					<view class="FourBox">
-						<text class="line" :class="[i == 0?'noline':'']"></text>
-						<text class="ali_top_icon" style="margin: 0 0;" v-if="item.remark.includes(ways.expName) || i == datas.length -1">发</text>
-						<!-- =====如果不够，可以再方法和过滤器中同时添加判断-----或者如下的--[v-else-if]操作 -->
-						<!-- <text class="ali_top_icon" style="margin: 0 0;" v-else-if="item.remark.includes('丰巢智能快递柜') && i!= datas.length-1">待</text> -->
-						<text class="ali_top_icon" :class="[item.remark.includes('签收')?'isOk':'']" style="margin: 0 0;" v-else-if="Type(item.remark) == true && i!= datas.length-1">{{item.remark | Type}}</text>
-						<view class="ali_top_icons" style="margin: 0 0;" v-else>
-							<text class="line" :class="[i == 0?'noline':'']"></text>
-							<text class="ali_top_iconss"></text>
-							<text class="line" :class="[i == 0?'noline':'']"></text>
-						</view>
+						<text class="ali_top_icon" :class="[item.AcceptStation.includes('签收') ? 'isOk' : '']" 
+						style="margin: 0 0;">
+						</text>
 						<text class="line" :class="[i == datas.length -1?'noline':'']"></text>
 					</view>
 					<view class="remark">
 						<text class="a14"  v-if="i == datas.length-1">已发货</text>
-						<text class="a14"  v-else>{{item.remark}}</text>
-						<text class="a12" style="padding-top: 10upx;">{{item.time}}</text>
+						<text class="a14"  v-else>{{item.AcceptStation}}</text>
+						<text class="a12" style="padding-top: 10upx;">{{item.AcceptTime}}</text>
 					</view>
 				</view>
 			</block>
@@ -34,7 +27,7 @@
 
 <script>
 	export default{
-		props:["datas","state","ways"],
+		props:["datas","state","ways","userAddress"],
 		data(){
 			return{
 				
@@ -81,6 +74,44 @@
 					Info = false;
 				}
 				return Info
+			},
+			getShipperName(code){
+				if ('ZTO' === code) {
+					return '中通快递';
+				}
+				if ('STO' === code) {
+					return '申通快递';
+				}
+				if ('YTO' === code) {
+					return '圆通速递';
+				}
+				if ('YD' === code) {
+					return '韵达速递';
+				}
+				if ('YZPY' === code) {
+					return '邮政快递包裹';
+				}
+				if ('EMS' === code) {
+					return 'EMS';
+				}
+				if ('HHTT' === code) {
+					return '天天快递';
+				}
+				if ('JD' === code) {
+					return '京东快递';
+				}
+				if ('UC' === code) {
+					return '优速快递';
+				}
+				if ('DBL' === code) {
+					return '德邦快递';
+				}
+				if ('ZJS' === code) {
+					return '宅急送';
+				}
+				if ('SF' === code) {
+					return '顺丰速运';
+				}
 			}
 		},
 	}

@@ -4,24 +4,15 @@
 		<view class="user-section">
 			<image class="bg" src="/static/user-bg.jpg"></image>
 			<view class="user-info-box">
-				<view class="portrait-box">
+				<view class="portrait-box" @tap="navTo">
 					<image class="portrait" :src="userInfo.avatar || '/static/missing-face.png'"></image>
 				</view>
 				<view class="info-box">
-					<text class="username">{{userInfo.nickName || '--'}}</text>
+					<text class="username">{{userInfo.nickName || lang.login}}</text>
 				</view>
 			</view>
 			<view class="vip-card-box">
 				<image class="card-bg" src="/static/vip-card-bg.png" mode=""></image>
-				<view class="b-btn">
-					{{lang.nowOpenMember}}
-				</view>
-				<view class="tit">
-					<text class="yticon icon-iLinkapp-"></text>
-					{{lang.member}}
-				</view>
-				<text class="e-m">{{lang.appName}}</text>
-				<text class="e-b">{{lang.openMember}}</text>
 			</view>
 		</view>
 		
@@ -34,22 +25,11 @@
 			@touchstart="coverTouchstart"
 			@touchmove="coverTouchmove"
 			@touchend="coverTouchend"
-		>
+			>
 			<image class="arc" src="/static/arc.png"></image>
 			
 			<view class="tj-sction">
-				<view class="tj-item">
-					<text class="num">128.8</text>
-					<text>{{lang.couponCard}}</text>
-				</view>
-				<view class="tj-item" v-show="false">
-					<text class="num">-</text>
-					<text></text>
-				</view>
-				<view class="tj-item">
-					<text class="num">20</text>
-					<text>{{lang.integral}}</text>
-				</view>
+				
 			</view>
 			<!-- 订单 -->
 			<view class="orderTitle">{{lang.myOrders}}</view>
@@ -72,27 +52,22 @@
 				</view>
 			</view>
 			<!-- 浏览历史 -->
-			<view class="history-section icon">
+			<view class="history-section icon" style="height: 100%;">
+				
 				<view class="sec-header">
 					<text class="yticon icon-lishijilu"></text>
 					<text>{{lang.browsingHistory}}</text>
 				</view>
+				
 				<scroll-view scroll-x class="h-list">
-					<!-- <image @click="navTo('/pages/product/product')" src="https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1553105186633&di=c121a29beece4e14269948d990f9e720&imgtype=0&src=http%3A%2F%2Fimg004.hc360.cn%2Fm8%2FM04%2FDE%2FDE%2FwKhQplZ-QteEBvsbAAAAADUkobU751.jpg" mode="aspectFill"></image>
-					<image @click="navTo('/pages/product/product')" src="https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1553105231218&di=09534b9833b5243296630e6d5b728eff&imgtype=0&src=http%3A%2F%2Fimg002.hc360.cn%2Fm1%2FM05%2FD1%2FAC%2FwKhQcFQ3iN2EQTo8AAAAAHQU6_8355.jpg" mode="aspectFill"></image>
-					<image @click="navTo('/pages/product/product')" src="https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1553105320890&di=c743386be51f2c4c0fd4b75754d14f3c&imgtype=0&src=http%3A%2F%2Fimg007.hc360.cn%2Fhb%2FMTQ1OTg4ODY0MDA3Ny05OTQ4ODY1NDQ%3D.jpg" mode="aspectFill"></image>
-					<image @click="navTo('/pages/product/product')" src="https://ss2.bdstatic.com/70cFvnSh_Q1YnxGkpoWK1HF6hhy/it/u=2691146630,2165926318&fm=26&gp=0.jpg" mode="aspectFill"></image>
-					<image @click="navTo('/pages/product/product')" src="https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1553105443324&di=8141bf13f3f208c61524d67f9bb83942&imgtype=0&src=http%3A%2F%2Fimg.zcool.cn%2Fcommunity%2F01ac9a5548d29b0000019ae98e6d98.jpg" mode="aspectFill"></image>
-					<image @click="navTo('/pages/product/product')" src="https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=191678693,2701202375&fm=26&gp=0.jpg" mode="aspectFill"></image> -->
+					<!-- <image @click="navTo('/pages/product/product')" src="https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=191678693,2701202375&fm=26&gp=0.jpg" mode="aspectFill"></image> -->
 				</scroll-view>
+				
 				<list-cell icon="icon-iconfontweixin" iconColor="#e07472" 
 				:title="lang.myPurse" tips="---"></list-cell>
 				
 				<list-cell icon="icon-dizhi" iconColor="#5fcda2" 
 				:title="lang.addresManage" @eventClick="navTo('/pages/address/address')"></list-cell>
-				
-				<list-cell icon="icon-pinglun-copy" iconColor="#ee883b" 
-				:title="lang.showOrder" tips="---"></list-cell>
 				
 				<list-cell icon="icon-shoucang_xuanzhongzhuangtai" 
 				iconColor="#54b4ef" :title="lang.myFavorite"></list-cell>
@@ -108,7 +83,7 @@
 </template>  
 <script>  
 	import listCell from '@/components/mix-list-cell';
-    import {  
+    import {
         mapState,
 		mapMutations
     } from 'vuex';  
@@ -121,7 +96,7 @@
 			return {
 				coverTransform: 'translateY(0px)',
 				coverTransition: '0s',
-				moving: false,
+				moving: false
 			}
 		},
 		onLoad() {
@@ -137,7 +112,7 @@
 			const index = e.index;
 			if (index === 0) {
 				this.navTo('/pages/set/set');
-			}else if(index === 1){
+			}else if(index === 1) {
 				// #ifdef APP-PLUS
 				const pages = getCurrentPages();
 				const page = pages[pages.length - 1];
@@ -173,7 +148,6 @@
 					url
 				})  
 			}, 
-	  
 			/**
 			 *  会员卡下拉和回弹
 			 *  1.关闭bounce避免ios端下拉冲突
@@ -216,6 +190,10 @@
     }  
 </script>  
 <style lang='scss'>
+	
+	.container {
+	}
+	
 	%flex-center {
 	 display:flex;
 	 flex-direction: column;
@@ -315,7 +293,8 @@
 		padding: 0 30upx;
 		position:relative;
 		background: #f5f5f5;
-		padding-bottom: 20upx;
+		padding-bottom: 300upx;
+		height: 100%;
 		.arc{
 			position:absolute;
 			left: 0;

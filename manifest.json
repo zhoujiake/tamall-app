@@ -15,8 +15,10 @@
             "delay" : 0
         },
         "modules" : {
-            "OAuth" : {},
-            "Payment" : {}
+            "Payment" : {},
+            "Push" : {},
+            "Speech" : {},
+            "OAuth" : {}
         },
         /* 模块配置 */
         "distribute" : {
@@ -28,6 +30,7 @@
                     "<uses-feature android:name=\"android.hardware.camera.autofocus\"/>",
                     "<uses-permission android:name=\"android.permission.ACCESS_COARSE_LOCATION\"/>",
                     "<uses-permission android:name=\"android.permission.ACCESS_FINE_LOCATION\"/>",
+                    "<uses-permission android:name=\"android.permission.ACCESS_MOCK_LOCATION\"/>",
                     "<uses-permission android:name=\"android.permission.ACCESS_NETWORK_STATE\"/>",
                     "<uses-permission android:name=\"android.permission.ACCESS_WIFI_STATE\"/>",
                     "<uses-permission android:name=\"android.permission.CALL_PHONE\"/>",
@@ -36,6 +39,7 @@
                     "<uses-permission android:name=\"android.permission.CHANGE_WIFI_STATE\"/>",
                     "<uses-permission android:name=\"android.permission.FLASHLIGHT\"/>",
                     "<uses-permission android:name=\"android.permission.GET_ACCOUNTS\"/>",
+                    "<uses-permission android:name=\"android.permission.GET_TASKS\"/>",
                     "<uses-permission android:name=\"android.permission.INTERNET\"/>",
                     "<uses-permission android:name=\"android.permission.MODIFY_AUDIO_SETTINGS\"/>",
                     "<uses-permission android:name=\"android.permission.MOUNT_UNMOUNT_FILESYSTEMS\"/>",
@@ -56,7 +60,7 @@
                 "oauth" : {
                     "weixin" : {
                         "appid" : "wx764ded0b6c2dfbbc",
-                        "appsecret" : "wx764ded0b6c2dfbbc",
+                        "appsecret" : "57d80aff44e5015e376740814d96ebda",
                         "UniversalLinks" : ""
                     }
                 },
@@ -66,7 +70,11 @@
                         "UniversalLinks" : ""
                     }
                 },
-                "maps" : {}
+                "maps" : {},
+                "ad" : {},
+                "speech" : {
+                    "ifly" : {}
+                }
             },
             "icons" : {
                 "android" : {
