@@ -1,77 +1,135 @@
 <template>
 	<view class="container">
-		<view class="list-cell b-b m-t" @click="navTo('个人资料')" hover-class="cell-hover" :hover-stay-time="50">
-			<text class="cell-tit">个人资料</text>
+		<view class="list-cell b-b m-t" @click="navTo('')" hover-class="cell-hover" :hover-stay-time="50">
+			<text class="cell-tit">{{lang.userInfo}}</text>
 			<text class="cell-more yticon icon-you"></text>
 		</view>
-		<view class="list-cell b-b" @click="navTo('收货地址')" hover-class="cell-hover" :hover-stay-time="50">
+	<!-- 	<view class="list-cell b-b" @click="navTo('收货地址')" hover-class="cell-hover" :hover-stay-time="50">
 			<text class="cell-tit">收货地址</text>
 			<text class="cell-more yticon icon-you"></text>
-		</view>
-		<view class="list-cell" @click="navTo('实名认证')" hover-class="cell-hover" :hover-stay-time="50">
+		</view> -->
+	<!-- 	<view class="list-cell" @click="navTo('实名认证')" hover-class="cell-hover" :hover-stay-time="50">
 			<text class="cell-tit">实名认证</text>
 			<text class="cell-more yticon icon-you"></text>
-		</view>
-		
-		<view class="list-cell m-t">
+		</view> -->
+	<!-- 	<view class="list-cell m-t">
 			<text class="cell-tit">消息推送</text>
 			<switch checked color="#fa436a" @change="switchChange" />
-		</view>
-		<view class="list-cell m-t b-b" @click="navTo('清除缓存')" hover-class="cell-hover" :hover-stay-time="50">
+		</view> -->
+		<!-- <view class="list-cell m-t b-b" @click="navTo('清除缓存')" hover-class="cell-hover" :hover-stay-time="50">
 			<text class="cell-tit">清除缓存</text>
 			<text class="cell-more yticon icon-you"></text>
-		</view>
-		<view class="list-cell b-b" @click="navTo('关于Dcloud')" hover-class="cell-hover" :hover-stay-time="50">
-			<text class="cell-tit">关于Dcloud</text>
+		</view> -->
+		<view class="list-cell b-b" @click="navTo('')" hover-class="cell-hover" :hover-stay-time="50">
+			<text class="cell-tit">{{lang.abaotUs}}</text>
 			<text class="cell-more yticon icon-you"></text>
 		</view>
-		<view class="list-cell">
-			<text class="cell-tit">检查更新</text>
-			<text class="cell-tip">当前版本 1.0.3</text>
+		<view class="list-cell" @click="checkAppVersion">
+			<text class="cell-tit">{{lang.checkVersion}}</text>
+			<text class="cell-tip">{{currentVersion}}</text>
 			<text class="cell-more yticon icon-you"></text>
 		</view>
 		<view class="list-cell log-out-btn" @click="toLogout">
-			<text class="cell-tit">退出登录</text>
+			<text class="cell-tit">{{lang.loginOut}}</text>
 		</view>
+		<uni-popup ref="tip" :type="type" :custom="true" :mask-click="false">
+			<view class="uni-tip">
+				<view class="uni-tip-title">{{lang.versionUpdate}}</view>
+				<view class="uni-tip-content">{{appNote}}</view>
+				<view class="uni-tip-group-button">
+					<view class="uni-tip-button" @click="updateApp(false)">{{lang.cancelUpdate}}</view>
+					<view class="uni-tip-button-confirm" @click="updateApp(true)">{{lang.confirmUpdate}}</view>
+				</view>
+			</view>
+		</uni-popup>
 	</view>
 </template>
 
 <script>
 	import {  
-	    mapMutations  
+		mapState,
+	    mapMutations
 	} from 'vuex';
 	export default {
 		data() {
 			return {
-				
+				currentVersion: '',
+				type: 'center',
+				appNote: '',
+				appUrl: '',
 			};
+		},
+		onLoad() {
+			//#ifdef APP-PLUS  
+			 this.currentVersion = this.lang.currentVersionFlag + plus.runtime.version  
+			//#endif
+			uni.setNavigationBarTitle({
+				title: this.lang.setting
+			})
+		},
+		computed: {
+			...mapState([
+				'lang',
+				'deviceInfo',
+			])
 		},
 		methods:{
 			...mapMutations(['logout']),
-
 			navTo(url){
-				this.$api.msg(`跳转到${url}`);
+				this.$api.msg(``);
 			},
 			//退出登录
 			toLogout(){
 				uni.showModal({
-				    content: '确定要退出登录么',
-				    success: (e)=>{
-				    	if(e.confirm){
-				    		this.logout();
-				    		setTimeout(()=>{
-				    			uni.navigateBack();
-				    		}, 200)
-				    	}
-				    }
-				});
+					confirmText: this.lang.ok,
+					cancelText: this.lang.no,
+					content: this.lang.loginOutMessage,
+					success: (e)=>{
+						if(e.confirm){
+							this.logout();
+							setTimeout(()=>{
+								uni.navigateBack();
+							}, 200)
+						}
+					}
+				})
 			},
 			//switch
 			switchChange(e){
 				let statusTip = e.detail.value ? '打开': '关闭';
 				this.$api.msg(`${statusTip}消息推送`);
 			},
-
+			checkAppVersion() {
+				//#ifdef APP-PLUS  
+				var server = this.$baseUrl + "app-update"; //检查更新地址  
+				var req = { //升级检测数据  
+					"appid": plus.runtime.appid,  
+					"version": plus.runtime.versionCode  
+				};  
+				uni.request({  
+					url: server,  
+					data: req,  
+					success: (res) => {
+						if (res.statusCode == 200 && res.data.data.status === 1) {  
+							// this.show = true//提醒用户更新  
+							this.$refs['tip'].open()
+							this.appNote = res.data.data.note
+							this.appUrl = res.data.data.url
+						} else {
+							this.$api.msg(this.lang.ltestVersion)
+						}
+					}  
+				})
+				//#endif  
+			},
+			updateApp(type) {
+				if (type) {
+					plus.runtime.openURL(this.appUrl);
+					this.$refs['tip'].close()
+				}else{
+					this.$refs['tip'].close()
+				}
+			}
 		}
 	}
 </script>
@@ -125,4 +183,45 @@
 			transform: translateX(16upx) scale(.84);
 		}
 	}
+	/* 提示窗口 */
+	.uni-tip {
+		padding: 15px;
+		width: 300px;
+		background: #fff;
+		box-sizing: border-box;
+		border-radius: 10px;
+	}
+	
+	.uni-tip-title {
+		text-align: center;
+		font-weight: bold;
+		font-size: 16px;
+		color: #333;
+	}
+	
+	.uni-tip-content {
+		padding: 15px;
+		font-size: 14px;
+		color: #666;
+	}
+	
+	.uni-tip-group-button {
+		margin-top: 10px;
+		display: flex;
+	}
+	
+	.uni-tip-button {
+		width: 100%;
+		text-align: center;
+		font-size: 14px;
+		color: #3b4144;
+	}
+	
+	.uni-tip-button-confirm {
+		width: 100%;
+		text-align: center;
+		font-size: 14px;
+		color: #ffaa00;
+	}
+	
 </style>

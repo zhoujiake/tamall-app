@@ -27,6 +27,9 @@
 		onLoad() {
 			this.searchPlaceholder = this.lang.searchGoods;
 			this.searchAlertTitle = this.lang.searchAlertTitle;
+			uni.setNavigationBarTitle({
+				title: this.lang.searchGoods
+			})
 		},
 		methods: {
 			onConfirm(value) {

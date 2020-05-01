@@ -23,6 +23,9 @@
 			onReady() {
 			},
 			onLoad() {
+				uni.setNavigationBarTitle({
+					title: this.lang.notice
+				})
 			},
 			onShow() {
 				if (this.JIM.isLogin()) {

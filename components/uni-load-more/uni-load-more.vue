@@ -45,9 +45,9 @@
 				type: Object,
 				default () {
 					return {
-						contentdown: "上拉显示更多",
-						contentrefresh: "正在加载...",
-						contentnomore: "没有更多数据了"
+						contentdown: "ཡར་འཐེན་གསལ་མཚོན་མང་བ།",
+						contentrefresh: "སྣོན་བཞིན་པ ༚༚༚༚༚ ",
+						contentnomore: "གྲངས་ཚིགས་གཞན་མེད་དོ།།"
 					};
 				}
 			}

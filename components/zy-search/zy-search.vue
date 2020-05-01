@@ -15,7 +15,7 @@
 		<template v-if="isBlock">
 			<view class="s-block" v-if="hList.length > 0">
 				<view class="header">
-					历史记录
+					{{lang.searchHistory}}
 					<image src="../../static/zy-search/delete.svg" mode="aspectFit" @click="delhistory"></image>
 				</view>
 				<view class="list">
@@ -23,7 +23,7 @@
 				</view>
 			</view>
 			<view class="wanted-block" v-if="showWant">
-				<view class="header">猜你想搜的</view>
+				<view class="header">{{lang.forUserSearch}}</view>
 				<view class="list">
 					<view v-for="(item,index) in wantList" :key="index" @click="keywordsClick(item)">{{item}}</view>
 				</view>
@@ -32,7 +32,7 @@
 		<template v-else>
 			<view class="s-circle" v-if="hList.length > 0">
 				<view class="header">
-					历史记录
+					{{lang.searchHistory}}
 					<image src="../../static/zy-search/delete.svg" mode="aspectFit" @click="delhistory"></image>
 				</view>
 				<view class="list">
@@ -40,7 +40,7 @@
 				</view>
 			</view>
 			<view class="wanted-circle" v-if="showWant">
-				<view class="header">猜你想搜的</view>
+				<view class="header">{{lang.forUserSearch}}</view>
 				<view class="list">
 					<view v-for="(item,index) in wantList" :key="index" @click="keywordsClick(item)">{{item}}</view>
 				</view>
@@ -50,6 +50,7 @@
 </template>
 
 <script>
+	import {mapState} from 'vuex';  
 	export default{
 		name:"zy-search",
 		props:{
@@ -75,7 +76,11 @@
 				wantList:[]	,//初始化推荐列表
 			};
 		},
-		
+		computed:{
+			...mapState([
+				'lang'
+			])
+		},
 		methods: {
 			searchStart: function() {	//触发搜索
 				let _this = this;

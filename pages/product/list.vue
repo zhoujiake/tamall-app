@@ -2,13 +2,13 @@
 	<view class="content">
 		<view class="navbar" :style="{position:headerPosition,top:headerTop}">
 			<view class="nav-item" :class="{current: filterIndex === 0}" @click="tabClick(0)">
-				综合排序
+				{{lang.complexSort}}
 			</view>
 			<view class="nav-item" :class="{current: filterIndex === 1}" @click="tabClick(1)">
-				新品
+				{{lang.newGoodsSort}}
 			</view>
 			<view class="nav-item" :class="{current: filterIndex === 2}" @click="tabClick(2)">
-				<text>价格</text>
+				<text>{{lang.priceSort}}</text>
 				<view class="p-box">
 					<text :class="{active: priceOrder === 1 && filterIndex === 2}" class="yticon icon-shang"></text>
 					<text :class="{active: priceOrder === 2 && filterIndex === 2}" class="yticon icon-shang xia"></text>
@@ -98,6 +98,9 @@
 			}
 			// this.loadCateList(options.fid, options.sid);
 			this.loadData();
+			uni.setNavigationBarTitle({
+				title: this.lang.goodsList
+			})
 		},
 		onPageScroll(e) {
 			//兼容iOS端下拉时顶部漂移

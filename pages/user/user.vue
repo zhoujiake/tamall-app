@@ -2,7 +2,7 @@
     <view class="container">  
 		
 		<view class="user-section">
-			<image class="bg" src="/static/user-bg.jpg"></image>
+			<image class="bg" :src="userBg"></image>
 			<view class="user-info-box">
 				<view class="portrait-box" @tap="navTo">
 					<image class="portrait" :src="userInfo.avatar || '/static/missing-face.png'"></image>
@@ -11,9 +11,9 @@
 					<text class="username">{{userInfo.nickName || lang.login}}</text>
 				</view>
 			</view>
-			<view class="vip-card-box">
+			<!-- <view class="vip-card-box">
 				<image class="card-bg" src="/static/vip-card-bg.png" mode=""></image>
-			</view>
+			</view> -->
 		</view>
 		
 		<view 
@@ -52,19 +52,19 @@
 				</view>
 			</view>
 			<!-- 浏览历史 -->
-			<view class="history-section icon" style="height: 100%;">
+			<view class="history-section icon">
 				
 				<view class="sec-header">
 					<text class="yticon icon-lishijilu"></text>
-					<text>{{lang.browsingHistory}}</text>
+					<text>{{lang.otherOptions}}</text>
 				</view>
 				
 				<scroll-view scroll-x class="h-list">
 					<!-- <image @click="navTo('/pages/product/product')" src="https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=191678693,2701202375&fm=26&gp=0.jpg" mode="aspectFill"></image> -->
 				</scroll-view>
 				
-				<list-cell icon="icon-iconfontweixin" iconColor="#e07472" 
-				:title="lang.myPurse" tips="---"></list-cell>
+			<!-- 	<list-cell icon="icon-iconfontweixin" iconColor="#e07472" 
+				:title="lang.myPurse" tips="---"></list-cell> -->
 				
 				<list-cell icon="icon-dizhi" iconColor="#5fcda2" 
 				:title="lang.addresManage" @eventClick="navTo('/pages/address/address')"></list-cell>
@@ -72,8 +72,8 @@
 				<list-cell icon="icon-shoucang_xuanzhongzhuangtai" 
 				iconColor="#54b4ef" :title="lang.myFavorite"></list-cell>
 				
-				<list-cell icon="icon-switch_lang" iconColor="#9789f7"
-				:title="lang.switchLanguage" tips=" " @eventClick="switchLang()"></list-cell>
+			<!-- 	<list-cell icon="icon-switch_lang" iconColor="#9789f7"
+				:title="lang.switchLanguage" tips=" " @eventClick="switchLang()"></list-cell> -->
 				
 				<list-cell icon="icon-shezhi1" iconColor="#e07472" 
 				:title="lang.setting" border="" @eventClick="navTo('/pages/set/set')"></list-cell>
@@ -96,7 +96,8 @@
 			return {
 				coverTransform: 'translateY(0px)',
 				coverTransition: '0s',
-				moving: false
+				moving: false,
+				userBg: '',// 用户背景图路径
 			}
 		},
 		onLoad() {
@@ -105,7 +106,9 @@
 				uni.setNavigationBarTitle({
 					title: title
 				})
-			},300)
+			},300);
+			// 根据时间段，显示不同的图片
+			this.getMycount()
 		},
 		// #ifndef MP
 		onNavigationBarButtonTap(e) {
@@ -131,11 +134,21 @@
 			...mapState(['hasLogin','userInfo', 'lang'])
 		},
         methods: {
-			...mapMutations(['changeLang']),
 			...mapMutations(['setTabBarLang']),
-            switchLang() {
-				this.changeLang()
-			},
+			getMycount(){
+		　　　　let self = this;
+		　　　　let date=new Date();
+		　　　　if(date.getHours() >= 5 && date.getHours() < 11){
+		　　　　　　self.hoursTip="上午好"
+				   this.userBg = "../../static/imgs/user-page-img-01.png"
+		　　　　}else if(date.getHours() >= 11&&date.getHours() < 18){
+		　　　　　　self.hoursTip="下午好"
+				   this.userBg = "../../static/imgs/user-page-img-02.png"
+		　　　　} else {
+		　　　　　　 self.hoursTip="晚上好"
+					this.userBg = "../../static/imgs/user-page-img-03.png"
+		　　　　}
+		　　},
 			/**
 			 * 统一跳转接口,拦截未登录路由
 			 * navigator标签现在默认没有转场动画，所以用view
@@ -191,7 +204,10 @@
 </script>  
 <style lang='scss'>
 	
-	.container {
+	.container{
+		width: 100vw;
+		height: 80vh;
+		background: #fff;
 	}
 	
 	%flex-center {
@@ -209,7 +225,7 @@
 	}
 
 	.user-section{
-		height: 520upx;
+		height: 600upx;
 		padding: 100upx 30upx 0;
 		position:relative;
 		.bg{
@@ -218,8 +234,6 @@
 			top: 0;
 			width: 100%;
 			height: 100%;
-			filter: blur(1px);
-			opacity: .7;
 		}
 	}
 	.user-info-box{
@@ -293,7 +307,7 @@
 		padding: 0 30upx;
 		position:relative;
 		background: #f5f5f5;
-		padding-bottom: 300upx;
+		padding-bottom: 30upx;
 		height: 100%;
 		.arc{
 			position:absolute;

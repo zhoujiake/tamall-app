@@ -7,7 +7,7 @@
 				:class="{current: tabCurrentIndex === index}"
 				@click="tabClick(index)"
 			>
-				{{item.text}}
+				{{texts[index]}}
 			</view>
 		</view>
 
@@ -59,17 +59,17 @@
 						<view class="price-box">
 							{{lang.count}}
 							<text class="num">{{item.newBeeMallOrderItemVOS.length}}</text>
-							件商品 实付款
+							 {{lang.orderItemsCount + alng.discountedPrice}}
 							<text class="price">{{item.totalPrice}}</text>
 						</view>
 						
 						<view class="action-box b-t" v-if="item.orderStatus == 0">
-							<button class="action-btn" @click="cancelOrder(item)">取消订单</button>
-							<button class="action-btn recom" @click="pay(item)">立即支付</button>
+							<button class="action-btn" @click="cancelOrder(item)">{{lang.cancelOrder}}</button>
+							<button class="action-btn recom" @click="pay(item)">{{lang.payment}}</button>
 						</view>
 						
 						<view class="action-box b-t" v-if="item.orderStatus == 2">
-							<button class="action-btn" @click="showLogistics(item)">查看物流</button>
+							<button class="action-btn" @click="showLogistics(item)">{{lang.showLogist}}</button>
 						</view>
 						
 					</view>
@@ -98,35 +98,36 @@
 				tabCurrentIndex: 0,
 				navList: [{
 						state: 0,
-						text: '全部',
+						text: '',
 						loadingType: 'more',
 						orderList: []
 					},
 					{
 						state: 1,
-						text: '待付款',
+						text: '',
 						loadingType: 'more',
 						orderList: []
 					},
 					{
 						state: 2,
-						text: '待收货',
+						text: '',
 						loadingType: 'more',
 						orderList: []
 					},
 					{
 						state: 3,
-						text: '已收货',
+						text: '',
 						loadingType: 'more',
 						orderList: []
 					},
 					{
 						state: 4,
-						text: '售后',
+						text: '',
 						loadingType: 'more',
 						orderList: []
 					}
 				],
+				texts : []
 			};
 		},
 		
@@ -144,6 +145,14 @@
 				this.loadData()
 			}
 			// #endif
+			uni.setNavigationBarTitle({
+				title: this.lang.myOrders
+			})
+			this.texts.push(this.lang.allOrders)
+			this.texts.push(this.lang.pendingPayment)
+			this.texts.push(this.lang.toBeReceived)
+			this.texts.push(this.lang.receipt)
+			this.texts.push(this.lang.afterSale)
 		},
 		computed: {
 			...mapState(['lang'])						
@@ -180,8 +189,7 @@
 					url = this.$baseUrl + "ordersForApp?page=" + this.pageNum + "&orderStatus=" + 4;
 				} else { // 全部
 					url = this.$baseUrl + "ordersForApp?page=" + this.pageNum;
-				}
-				// 调用我的订单接口（全部）
+				}				// 调用我的订单接口（全部）
 				uni.request({
 					url: url,
 					method: "GET",

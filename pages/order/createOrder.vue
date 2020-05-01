@@ -49,13 +49,13 @@
 				</text>
 				<text class="cell-more wanjia wanjia-gengduo-d"></text>
 			</view>
-			<view v-show="false" class="yt-list-cell b-b">
+			<!-- <view v-show="false" class="yt-list-cell b-b">
 				<view class="cell-icon hb">
 					减
 				</view>
 				<text class="cell-tit clamp">商家促销</text>
 				<text class="cell-tip disabled">暂无可用优惠</text>
-			</view>
+			</view> -->
 		</view>
 		<!-- 金额明细 -->
 		<view class="yt-list">
@@ -89,8 +89,7 @@
 		
 		<!-- 优惠券面板 -->
 		<view class="mask" :class="maskState===0 ? 'none' : maskState===1 ? 'show' : ''" @click="toggleMask">
-			<view class="mask-content" @click.stop.prevent="stopPrevent">
-				<!-- 优惠券页面，仿mt -->
+			<!-- <view class="mask-content" @click.stop.prevent="stopPrevent">
 				<view class="coupon-item" v-for="(item,index) in couponList" :key="index">
 					<view class="con">
 						<view class="left">
@@ -107,7 +106,7 @@
 					</view>
 					<text class="tips">限新用户使用</text>
 				</view>
-			</view>
+			</view> -->
 		</view>
 
 	</view>

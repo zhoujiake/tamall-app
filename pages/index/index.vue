@@ -15,7 +15,7 @@
 			<swiper class="carousel" :autoplay="true" :interval="3500" circular 
 			    @change="swiperChange" :duration="duration">
 				<swiper-item v-for="(item, index) in carouselList" :key="index" class="carousel-item"
-				 @click="navToList(item.redirectUrl)">
+				 @click="carouselImgNaveto(item.redirectUrl)">
 					<image :src="item.carouselUrl" />
 				</swiper-item>
 			</swiper>
@@ -63,7 +63,7 @@
 			<view class="cate-item" @click="navToList(359)">
 				<image src="/static/imgs/xianglian.png"></image>
 				<text>{{lang.necklace}}</text><!-- 饰品 -->
-			</view> 
+			</view>
 			<view class="cate-item" @click="navToList(422)">
 				<image src="/static/imgs/yao.png"></image>
 				<text>{{lang.medicine}}</text><!-- 药品 -->
@@ -217,10 +217,21 @@
 			</view>
 		</view>
 		<uni-load-more :status="loadingType"></uni-load-more>
+		<uni-popup ref="tip" :type="type" :custom="true" :mask-click="false">
+			<view class="uni-tip">
+				<view class="uni-tip-title">{{lang.versionUpdate}}</view>
+				<view class="uni-tip-content">{{appNote}}</view>
+				<view class="uni-tip-group-button">
+					<view class="uni-tip-button" @click="updateApp(false)">{{lang.cancelUpdate}}</view>
+					<view class="uni-tip-button-confirm" @click="updateApp(true)">{{lang.confirmUpdate}}</view>
+				</view>
+			</view>
+		</uni-popup>
 	</view>
 </template>
 
 <script>
+import uniPopup from '@/components/uni-popup/uni-popup.vue'
 import {mapState, mapMutations} from 'vuex';  
 	export default {
 		data() {
@@ -242,14 +253,20 @@ import {mapState, mapMutations} from 'vuex';
 				pageNum : 1,
 				cids : "108",
 				topImageUrl : '',
+				type: 'center',
+				appNote: '',
+				appUrl: '',
 			};
 		},
+		components: {uniPopup},
 		onLoad() {
 		  this.loadCarouselList();// 加载轮播图数据
 		  this.loadHotGoodsesList(); // 加载热销商品数据
 		  this.newGoodsesList(); // 加载新品数据
 		  this.loadRecommendGoodsesList(); // 加载推荐商品数据
 		  this.topImageUrl = 'http://39.107.231.238:8080/upload/indexImage/212221212.jpg'
+		  // 版本检查
+		  this.checkAppVersion()
 		},
 		onUnload() {
 			console.log("JIM loginOut ----->>")
@@ -278,6 +295,9 @@ import {mapState, mapMutations} from 'vuex';
 				this.getJPushData()
 			}
 		},
+		onHide() {
+			this.$refs['tip'].close()
+		},
 		//加载更多
 		onReachBottom(){
 			this.loadRecommendGoodsesList();
@@ -291,6 +311,7 @@ import {mapState, mapMutations} from 'vuex';
 		},
 		methods: {
 			...mapMutations(['login','setDeviceInfo','getJPushData']),
+			...mapMutations(['changeLang']),
 			// 登录
 			userLogin(userInfo) {
 				var httpUrl = '';
@@ -425,12 +446,46 @@ import {mapState, mapMutations} from 'vuex';
 						}
 					}
 				});
-				
 			},
 			navToList(tid) {
 				uni.navigateTo({
 					url: `/pages/product/list?tid=${tid}&isForCategoryGoods=1`
 				})
+			},
+			// 点击轮播图进入商品详情界面
+			carouselImgNaveto(gid) {
+				uni.navigateTo({
+					url: `/pages/product/product?id=${gid}`
+				})
+			},
+			checkAppVersion() {
+				//#ifdef APP-PLUS  
+				var server = this.$baseUrl + "app-update"; //检查更新地址  
+				var req = { //升级检测数据  
+					"appid": plus.runtime.appid,  
+					"version": plus.runtime.versionCode  
+				};  
+				uni.request({  
+					url: server,  
+					data: req,  
+					success: (res) => {
+						if (res.statusCode == 200 && res.data.data.status === 1) {  
+							// this.show = true//提醒用户更新  
+							this.$refs['tip'].open()
+							this.appNote = res.data.data.note
+							this.appUrl = res.data.data.url
+						}  
+					}  
+				})
+				//#endif  
+			},
+			updateApp(type) {
+				if (type) {
+					this.$refs['tip'].close()
+					plus.runtime.openURL(this.appUrl);
+				}else{
+					this.$refs['tip'].close()
+				}
 			}
 		},
 		// #ifndef MP
@@ -443,9 +498,9 @@ import {mapState, mapMutations} from 'vuex';
 		//点击导航栏 buttons 时触发
 		onNavigationBarButtonTap(e) {
 			const index = e.index;
-			if (index === 0) {
-				this.$api.msg('点击了扫描');
-			} else if (index === 1) {
+			if (index === 0) { // 语言切换
+				this.changeLang()
+			} else if (index === 1) { // 消息
 				// #ifdef APP-PLUS
 				const pages = getCurrentPages();
 				const page = pages[pages.length - 1];
@@ -458,7 +513,7 @@ import {mapState, mapMutations} from 'vuex';
 					url: '/pages/notice/notice'
 				})
 			}
-		}
+		},
 		// #endif
 	}
 </script>
@@ -536,6 +591,47 @@ import {mapState, mapMutations} from 'vuex';
 			transition: .4s;
 		}
 	}
+	/* 提示窗口 */
+	.uni-tip {
+		padding: 15px;
+		width: 300px;
+		background: #fff;
+		box-sizing: border-box;
+		border-radius: 10px;
+	}
+	
+	.uni-tip-title {
+		text-align: center;
+		font-weight: bold;
+		font-size: 16px;
+		color: #333;
+	}
+	
+	.uni-tip-content {
+		padding: 15px;
+		font-size: 14px;
+		color: #666;
+	}
+	
+	.uni-tip-group-button {
+		margin-top: 10px;
+		display: flex;
+	}
+	
+	.uni-tip-button {
+		width: 100%;
+		text-align: center;
+		font-size: 14px;
+		color: #3b4144;
+	}
+	
+	.uni-tip-button-confirm {
+		width: 100%;
+		text-align: center;
+		font-size: 14px;
+		color: #ffaa00;
+	}
+	
 	.carousel {
 		width: 100%;
 		height: 350upx;

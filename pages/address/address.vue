@@ -59,7 +59,7 @@
 							 })
 							 var list = uni.getStorageSync("addressList")
 						 } else {
-						 	this.$api.msg(res.data.message);
+						 	this.$api.msg(this.lang.noAddressInfo);
 						 }
 				    }
 				});

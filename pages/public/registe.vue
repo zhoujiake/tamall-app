@@ -1,63 +1,64 @@
 <template>
 	<view class="container">
-		<view class="left-bottom-sign"></view>
+		<view class="top-sign">
+			<image src="../../static/imgs/login-bg-top.png" style="width: 100%;"></image>
+		</view>
 		<view class="back-btn yticon icon-zuojiantou-up" @click="navBack"></view>
-		<view class="right-top-sign"></view>
 		<!-- 设置白色背景防止软键盘把下部绝对定位元素顶上来盖住输入框等 -->
 		<view class="wrapper">
-			<view class="left-top-sign">LOGIN</view>
+			<view class="left-top-sign">{{lang.regist}}</view>
 			<view class="welcome">
-				用户注册
+				{{lang.loginRegistry}}
 			</view>
 		    <form @submit="toRegist">
 				<view class="input-content">
 					<view class="input-item">
-						<text class="tit">昵称</text>
+						<text class="tit">{{lang.nickName}}</text>
 						<input 
 						    name="nickName"
 							type="text" 
 							v-model="nickName"
-							placeholder="请输入用户名/昵称"
+							:placeholder="lang.inputUserName"
 							maxlength="20"
 						/>
 					</view>
 				    <view class="input-item">
-				    	<text class="tit">用户名/手机号码</text>
+				    	<text class="tit">{{lang.userNameAndPhoneNumber}}</text>
 				    	<input 
 				    	    name="loginName"
 				    		type="number" 
-				    		placeholder="请输入手机号码"
+				    		:placeholder="lang.inputPhoneNumber"
 				    		maxlength="11"
 							v-model="mobile"
 				    	/>
 				    </view>
 					<view class="gender-radio">
 						<radio-group name="gender" >
-							<label>
-								<radio value="1" /><text>男</text>
+							<label style="margin-right: 20upx;">
+								<radio value="1" /><text>{{lang.male}}</text>
 							</label>
 							<label>
-								<radio value="2" /><text>女</text>
+								<radio value="2" /><text>{{lang.Female}}</text>
 							</label>
 						</radio-group>
 					</view>
 					<view class="input-item">
-						<text class="tit">邮箱</text>
+						<text class="tit">{{lang.email}}</text>
 						<input
 						    name="email"
 							type="text" 
-							placeholder="请输入邮箱号"
+							:placeholder="lang.inputEmail"
 							placeholder-class="input-empty"
 							maxlength="30"
 							v-model="email"
 						/>
 					</view>	
 					<view class="input-item">
-						<text class="tit">密码</text>
+						<text class="tit">{{lang.loginPwd}}</text>
 						<input
 						    name="password"
 							type="text" 
-							placeholder="8-18位不含特殊字符的数字、字母组合"
+							:placeholder="lang.loginPasswordMsg"
 							placeholder-class="input-empty"
 							maxlength="20"
 							password 
@@ -65,11 +66,11 @@
 						/>
 					</view>	
 					<view class="input-item">
-						<text class="tit">确认密码</text>
+						<text class="tit">{{lang.confirmPwd}}</text>
 						<input
 						    name="password"
 							type="text" 
-							placeholder="请输入确认密码"
+							:placeholder="lang.inputPhoneNumber"
 							placeholder-class="input-//empty"
 							maxlength="20"
 							password
@@ -80,7 +81,7 @@
 					   form-type="submit" 
 					   class="confirm-btn" 
 					   :disabled="logining">
-					     注册
+					     {{lang.regist}}
 					</button>
 				</view>
 			</form>
@@ -90,7 +91,7 @@
 
 <script>
 	import {
-        mapMutations  
+        mapMutations,mapState
     } from 'vuex';
 	
 	export default{
@@ -108,6 +109,9 @@
 			
 		},
 		onReady() {
+		},
+		computed: {
+			...mapState(['JIM','deviceInfo','lang'])
 		},
 		methods: {
 			...mapMutations(['setUserInfo']),
@@ -205,11 +209,13 @@
 		overflow: hidden;
 		background: #fff;
 	}
-	.wrapper{
-		position:relative;
-		z-index: 90;
-		background: #fff;
-		padding-bottom: 40upx;
+	.top-sign{
+		position:absolute;
+		top:0upx;
+		z-index: 0;
+		overflow: hidden;
+		height: auto;
+		width: 100%;
 	}
 	.back-btn{
 		position:absolute;
@@ -220,44 +226,12 @@
 		font-size: 40upx;
 		color: $font-color-dark;
 	}
-	.left-top-sign{
-		font-size: 120upx;
-		color: $page-color-base;
-		position:relative;
-		left: -16upx;
-	}
-	.right-top-sign{
-		position:absolute;
-		top: 80upx;
-		right: -30upx;
-		z-index: 95;
-		&:before, &:after{
-			display:block;
-			content:"";
-			width: 400upx;
-			height: 80upx;
-			background: #b4f3e2;
-		}
-		&:before{
-			transform: rotate(50deg);
-			border-radius: 0 50px 0 0;
-		}
-		&:after{
-			position: absolute;
-			right: -198upx;
-			top: 0;
-			transform: rotate(-50deg);
-			border-radius: 50px 0 0 0;
-			/* background: pink; */
-		}
-	}
-	.left-bottom-sign{
-		position:absolute;
-		left: -270upx;
-		bottom: -320upx;
-		border: 100upx solid #d0d1fd;
-		border-radius: 50%;
-		padding: 180upx;
+	
+	.wrapper{
+		margin-top: 26upx;
+		z-index: 10;
+		background: #fff;
+		padding-bottom: 40upx;
 	}
 	.welcome{
 		position:relative;
@@ -267,6 +241,13 @@
 		color: #555;
 		text-shadow: 1px 0px 1px rgba(0,0,0,.3);
 	}
+	.left-top-sign{
+		font-size: 120upx;
+		color: $page-color-base;
+		position:relative;
+		left: -16upx;
+	}
+	
 	.input-content{
 		padding: 0 60upx;
 	}
@@ -332,6 +313,9 @@
 	.gender-radio {
 		display: flex;
 		flex-direction: column;
-		align-items: flex-end;
+		align-items: flex-start;
+		margin-top: -20upx;
+		margin-bottom: 20upx;
+		margin-right: 10upx;
 	}
 </style>

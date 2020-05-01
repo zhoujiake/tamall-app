@@ -1,37 +1,38 @@
 <template>
 	<view class="container">
-		<view class="left-bottom-sign"></view>
-		<view class="right-top-sign"></view>
+		<view class="top-sign">
+			<image src="../../static/imgs/login-bg-top.png" style="width: 100%;"></image>
+		</view>
 		<view class="right-close-button" @click="navBack">
 			<image src="../../static/imgs/close.png" style="width: 40upx; height: 40upx;"></image>
 		</view>
 		<!-- 设置白色背景防止软键盘把下部绝对定位元素顶上来盖住输入框等 -->
 		<view class="wrapper">
-			<view class="left-top-sign">LOGIN</view>
+			<view class="left-top-sign">{{lang.welcomeLogin}}</view>
 			<view class="welcome">
-				欢迎回来！
+				{{lang.welcome}}
 			</view>
-		    <form @submit="toLogin">
+		    <form @submit="toLogin" >
 				<view class="input-content">
 					<view class="input-item">
-						<text class="tit">手机号码</text>
-						<input 
+						<text class="tit">{{lang.phoneNumber}}</text>
+						<input
 						    name="loginName"
 							type="number" 
 							:value="mobile"
-							placeholder="请输入手机号码"
+							:placeholder="lang.inputPhoneNumber"
 							maxlength="11"
 							data-key="mobile"
 							@input="inputChange"
 						/>
 					</view>
 					<view class="input-item">
-						<text class="tit">密码</text>
+						<text class="tit">{{lang.loginPwd}}</text>
 						<input
 						    name="password"
 							type="mobile" 
 							value="" 
-							placeholder="8-18位不含特殊字符的数字、字母组合"
+							:placeholder="lang.loginPasswordMsg"
 							placeholder-class="input-empty"
 							maxlength="20"
 							password 
@@ -40,11 +41,11 @@
 						/>
 					</view>
 				</view>
-				<button form-type="submit" class="confirm-btn" :disabled="logining">登录</button>
+				<button form-type="submit" class="confirm-btn" :disabled="logining">{{lang.login}}</button>
 			</form>
-			<view class="forget-section">
-				忘记密码?
-			</view>
+			<!-- <view class="forget-section">
+				{{lang.forgetPassword}}
+			</view> -->
 		</view>
 		<view class="oauth-row" v-if="hasProvider" v-bind:style="{top: positionTop + 'px'}">
 		    <view class="oauth-image" v-for="provider in providerList" :key="provider.value">
@@ -52,9 +53,11 @@
 		    </view>
 		</view>
 		<view class="register-section">
-			还没有账号? <text @tap="toRegist()">马上注册</text>
+			{{lang.noAccountYet}}<text @tap="toRegist()">{{lang.registryNow}}</text>
 		</view>
-		
+		<view class="bottom-sign">
+			<image src="../../static/imgs/login-bg-bottom.png" style="width: 100%;height: 120upx;"></image>
+		</view>
 	</view>
 </template>
 
@@ -85,7 +88,7 @@
 			this.initProvider()
 		},
 		computed: {
-			...mapState(['JIM','deviceInfo','jimUserName'])
+			...mapState(['JIM','deviceInfo','jimUserName','lang'])
 		},
 		methods: {
 			...mapMutations(['login']),
@@ -276,6 +279,14 @@
 		overflow: hidden;
 		background: #fff;
 	}
+	.top-sign{
+		position:absolute;
+		top:0upx;
+		z-index: 0;
+		overflow: hidden;
+		height: auto;
+		width: 100%;
+	}
 	.right-close-button{
 		position:absolute;
 		right: 40upx;
@@ -286,10 +297,19 @@
 		color: $font-color-dark;
 	}
 	.wrapper{
-		position:relative;
-		z-index: 90;
+		margin-top: 26upx;
+		z-index: 10;
 		background: #fff;
 		padding-bottom: 40upx;
+	}
+	.bottom-sign{
+		position:absolute;
+		bottom:10upx;
+		z-index: -0;
+		overflow: hidden;
+		height: 120upx;
+		width: 100%;
+		margin-bottom: 120upx;
 	}
 	.back-btn{
 		position:absolute;
@@ -306,33 +326,9 @@
 		position:relative;
 		left: -16upx;
 	}
-	.right-top-sign{
-		position:absolute;
-		top: 80upx;
-		right: -30upx;
-		z-index: 95;
-		&:before, &:after{
-			display:block;
-			content:"";
-			width: 400upx;
-			height: 80upx;
-			background: #b4f3e2;
-		}
-		&:before{
-			transform: rotate(50deg);
-			border-radius: 0 50px 0 0;
-		}
-		&:after{
-			position: absolute;
-			right: -198upx;
-			top: 0;
-			transform: rotate(-50deg);
-			border-radius: 50px 0 0 0;
-			/* background: pink; */
-		}
-	}
+	
 	.left-bottom-sign{
-		position:absolute;
+		position: absolute;
 		left: -270upx;
 		bottom: -320upx;
 		border: 100upx solid #d0d1fd;
@@ -349,6 +345,7 @@
 	}
 	.input-content{
 		padding: 0 60upx;
+		z-index: 10;
 	}
 	.input-item{
 		display:flex;
@@ -383,7 +380,7 @@
 		line-height: 76upx;
 		border-radius: 50px;
 		margin-top: 70upx;
-		background: $uni-color-primary;
+		background: #3d738a;
 		color: #fff;
 		font-size: $font-lg;
 		&:after{
@@ -433,15 +430,15 @@
 	.oauth-image {
 	    width: 50px;
 	    height: 50px;
-	    border: 1px solid #dddddd;
+	    border: 1px solid #FFF;
 	    border-radius: 50px;
 	    margin: 0 20px;
 	    background-color: #ffffff;
 	}
 	
 	.oauth-image image {
-	    width: 30px;
-	    height: 30px;
-	    margin: 10px;
+	    width: 50px;
+	    height: 50px;
+	    margin: 0px;
 	}
 </style>
