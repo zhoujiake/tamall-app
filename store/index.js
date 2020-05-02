@@ -30,8 +30,6 @@ try {
 }
 
 // 初始化JMI
-// const JIM = new jimSdk();
-
 const store = new Vuex.Store({
 	state: {
 		hasLogin: false,
@@ -44,8 +42,8 @@ const store = new Vuex.Store({
 		//播放语音相关参数
 		AUDIO : uni.createInnerAudioContext(),
 		vue : Vue,
-		jimUserName : '12345678',
-		jimNickName : '	客服',
+		jimUserName : 'nhkj-manager',
+		jimNickName : 'ཨ་ཁྲོམ།',
 		chatVueObject : null
 	},
 	mutations: { 
@@ -55,7 +53,7 @@ const store = new Vuex.Store({
 			uni.setStorage({//缓存用户登陆状态
 			    key: 'userInfo',  
 			    data: provider  
-			})
+			});
 		},
 		setUserInfo(state, userInfo){
 			state.userInfo = userInfo;
@@ -66,6 +64,8 @@ const store = new Vuex.Store({
 			uni.removeStorage({
                 key: 'userInfo'  
             })
+			// JIM登出
+			state.JIM.loginOut();
 		},
 		changeLang: function(state) {
 			uni.showActionSheet({
@@ -129,8 +129,8 @@ const store = new Vuex.Store({
 		},
 		// jpush的相关信息
 		getJPushData(state) {
-			state.JIM = null
-			state.JIM = new jimSdk()
+			/* state.JIM = null
+			state.JIM = new jimSdk() */
 			// 判断是否初始化
 			if (!state.JIM.isInit()) {
 				uni.request({
@@ -159,7 +159,7 @@ const store = new Vuex.Store({
 		JMIregister(state) {
 			state.JIM.register({
 					'username' : state.userInfo.loginName,
-					'password' : state.userInfo.password,
+					'password' : "123456",
 					'nickname' : state.userInfo.nickName
 				}).onSuccess(data => {
 					this.commit('JMIlogin')
@@ -173,7 +173,7 @@ const store = new Vuex.Store({
 			uni.setStorageSync(state.userInfo.loginName, '[]')
 			state.JIM.login({
 			            'username' : state.userInfo.loginName,
-						'password' : state.userInfo.password
+						'password' : "123456" // 默认密码
 			        }).onSuccess(data => {
 						console.log('JIM login success');
 						// uni.setStorageSync(state.jimUserName, '')

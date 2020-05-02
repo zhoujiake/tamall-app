@@ -37,7 +37,7 @@
 							</view>
 							<!-- 右-头像 -->
 							<view class="right">
-								<image src="/static/chat-img/im/face/face_1.jpg"></image>
+								<image :src="userInfo.avatar"></image>
 							</view>
 						</view>
 						<!-- 别人发出的消息 -->
@@ -235,7 +235,8 @@ import {mapState, mapMutations} from 'vuex';
 			...mapState([
 				'lang',
 				'JIM',
-				'authPayload'			
+				'authPayload',
+				'userInfo'
 			])
 		},
 		methods:{

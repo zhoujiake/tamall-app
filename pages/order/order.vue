@@ -14,7 +14,7 @@
 		<swiper :current="tabCurrentIndex" class="swiper-box" duration="300" @change="changeTab">
 			<swiper-item class="tab-content" v-for="(tabItem,tabIndex) in navList" :key="tabIndex">
 				<scroll-view 
-					class="list-scroll-content" 
+					class="list-scroll-content"
 					scroll-y
 					@scrolltolower="loadData"
 				>
@@ -28,7 +28,8 @@
 						
 						<view class="i-top b-b">
 							<text class="time">{{parsingDate(item.createTime)}}</text>
-							<text class="state" :style="{color: item.stateTipColor}">{{item.orderStatusString}}</text>
+							<text class="state" :style="{color: item.stateTipColor}">
+										{{getOrderStateTransf(item.orderStatusString)}}</text>
 							<text
 								v-if="item.orderStatus === 0"
 								class="del-btn yticon icon-iconfontshanchu1"
@@ -59,7 +60,7 @@
 						<view class="price-box">
 							{{lang.count}}
 							<text class="num">{{item.newBeeMallOrderItemVOS.length}}</text>
-							 {{lang.orderItemsCount + alng.discountedPrice}}
+							 {{lang.orderItemsCount + lang.discountedPrice}}
 							<text class="price">{{item.totalPrice}}</text>
 						</view>
 						
@@ -68,7 +69,8 @@
 							<button class="action-btn recom" @click="pay(item)">{{lang.payment}}</button>
 						</view>
 						
-						<view class="action-box b-t" v-if="item.orderStatus == 2">
+						<view class="action-box b-t" v-if="item.orderStatus == 3">
+							<button class="action-btn" @click="confirmReceipt(item)">{{lang.confirmReceipt}}</button>
 							<button class="action-btn" @click="showLogistics(item)">{{lang.showLogist}}</button>
 						</view>
 						
@@ -153,13 +155,23 @@
 			this.texts.push(this.lang.toBeReceived)
 			this.texts.push(this.lang.receipt)
 			this.texts.push(this.lang.afterSale)
+			uni.startPullDownRefresh();
 		},
 		computed: {
 			...mapState(['lang'])						
 		},
+		// 下拉刷新
+		onPullDownRefresh(){
+			let index = this.tabCurrentIndex;
+			let navItem = this.navList[index];
+			navItem.orderList = []
+			navItem.loaded = false
+			this.pageNum = 1
+			this.loadData('tabChange');
+		},
 		methods: {
 			//获取订单列表
-			loadData(source) {
+			async loadData(source) {
 				//这里是将订单挂载到tab列表下
 				let index = this.tabCurrentIndex;
 				let navItem = this.navList[index];
@@ -211,6 +223,7 @@
 							//判断是否还有数据， 有改为 more， 没有改为noMore 
 							navItem.loadingType = '';
 						}
+						uni.stopPullDownRefresh();
 					}
 				});
 			}, 
@@ -281,6 +294,33 @@
 					url: `/pages/order/orderStep?orderId=${item.orderId}&userAddress=${item.userAddress}`
 				});
 			},
+			// 确认收货
+			confirmReceipt(item) {
+				uni.showModal({
+					confirmText: this.lang.ok,
+					cancelText: this.lang.no,
+					content: this.lang.confirmReceiptMsg,
+					success: (e)=>{
+						if(e.confirm){
+							// 取消订单
+							uni.request({
+								url: this.$baseUrl + "orders/"+ item.orderNo +"/finish",
+								method: "PUT",
+								success: (res) => {
+									if (res.data.resultCode == 200) {
+										//取消订单后删除待付款中该项
+										item.orderStatus =+1
+										item.orderStatusString = this.getOrderStateTransf("交易成功")
+									} else {
+										
+									}
+									uni.hideLoading();
+								}
+							});
+						}
+					}
+				})
+			},
 			//订单状态文字和颜色
 			orderStateExp(state) {
 				let stateTip = '',
@@ -297,6 +337,29 @@
 					//更多自定义
 				}
 				return {stateTip, stateTipColor};
+			},
+			getOrderStateTransf(text) {
+				let trans = "";
+				if(text.includes('待支付')) {
+				   	trans = this.lang.toBePaid;
+					return trans
+				}
+				if(text.includes('已支付')) {
+				   	trans = this.lang.paid;
+					return trans
+				}
+				if(text.includes('配货完成')) {
+				   	trans = this.lang.distribution;
+					return trans
+				}
+				if(text.includes('出库成功')) {
+				   	trans = this.lang.shipped;
+					return trans
+				}
+				if(text.includes('交易成功')) {
+				   	trans = this.lang.afterSaleInOrder;
+					return trans
+				}
 			}
 		},
 	}
@@ -470,7 +533,7 @@
 			padding-right: 30upx;
 		}
 		.action-btn{
-			width: 160upx;
+			width: 180upx;
 			height: 60upx;
 			margin: 0;
 			margin-left: 24upx;
@@ -478,8 +541,8 @@
 			text-align: center;
 			line-height: 60upx;
 			font-size: $font-sm + 2upx;
-			color: $font-color-dark;
-			background: #fff;
+			color: #FFF;
+			background: $uni-color-primary;
 			border-radius: 100px;
 			&:after{
 				border-radius: 100px;

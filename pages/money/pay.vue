@@ -53,7 +53,7 @@ import {mapState, mapMutations} from 'vuex';
 				payType: 1,
 				orderInfo: {},
 				orderNo: 0,
-				amount: 0,
+				amount: 0.01, // 钱
 				payObject: {
 					orderNo: '',
 					totalFee: 0
@@ -67,7 +67,7 @@ import {mapState, mapMutations} from 'vuex';
 		},
 		onLoad(options) {
 			this.orderNo = options.orderNo;
-			this.amount = options.amount;
+			//this.amount = options.amount;
 			// 标题文字
 			var title = this.lang.payment;
 			setTimeout(() => {

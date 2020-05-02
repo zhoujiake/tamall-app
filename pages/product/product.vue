@@ -109,27 +109,27 @@
 		<!-- 底部操作菜单 -->
 		<view class="page-bottom">
 			<navigator url="/pages/index/index" open-type="switchTab" class="p-b-btn">
-				<text class="yticon icon-xiatubiao--copy"></text>
+				<image src="/static/ic_home0.png" style="width:50upx; height:60upx;"></image>
 				<text>{{lang.homePage}}</text>
 			</navigator>
 			<navigator url="/pages/cart/cart" open-type="switchTab" class="p-b-btn">
-				<text class="yticon icon-gouwuche"></text>
+				<image src="/static/ic_carte0.png" style="width:55upx; height:60upx;"></image>
 				<text>{{lang.cart}}</text>
 			</navigator>
 			<view class="p-b-btn" :class="{active: favorite}" @click="toFavorite">
-				<text class="yticon icon-shoucang"></text>
+				<image src="/static/ic_favorite.png" style="width:50upx; height:60upx;"></image>
 				<text>{{lang.favorite}}</text>
 			</view>
 			
 			<view class="action-btn-group">
-				<button type="primary" class="action-btn no-border buy-now-btn" @click="addShopCart(true)">
-					{{lang.buyNow}}</button>
 				<button type="primary" class="action-btn no-border add-cart-btn" @tap="addShopCart(false)">
 					{{lang.addToCart}}</button>
+				<button type="primary" class="action-btn no-border buy-now-btn" @click="addShopCart(true)">
+					{{lang.buyNow}}</button>
 			</view>
 		</view>
 		<!-- 规格-模态层弹窗 -->
-		<view 
+		<view
 			class="popup spec"
 			:class="specClass"
 			@touchmove.stop.prevent="stopPrevent"
@@ -223,7 +223,8 @@
 				'lang',
 				'jimUserName',
 				'jimNickName',
-				'JIM'
+				'JIM',
+				'hasLogin'
 			])
 		},
 		methods:{
@@ -283,7 +284,14 @@
 			},
 			//收藏
 			toFavorite(){
-				this.favorite = !this.favorite;
+				if(!this.hasLogin){ // 未登录时执行
+					let url = '/pages/public/login';
+					uni.navigateTo({
+						url
+					})
+				} else {
+					this.favorite = !this.favorite;
+				}
 			},
 			buy(){
 				// 提交订单
@@ -307,6 +315,13 @@
 				url: '/pages/chat/chat'
 			})},
 			toChatPage() {
+				if(!this.hasLogin){ // 未登录时执行
+					let url = '/pages/public/login';
+					uni.navigateTo({
+						url
+					}) 
+					return
+				}
 				this.JIM.resetUnreadCount({'username' : this.jimUserName}); // 该用户的消息未读数设置为空
 				this.JIM.updateConversation({
 				 'username' : this.jimUserName,

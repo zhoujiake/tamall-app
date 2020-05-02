@@ -54,6 +54,15 @@
 				return Info
 			}
 		},
+		onLoad() {
+			debugger
+			let title = this.getShipperName(this.ways.ShipperCode)
+			setTimeout(() => {
+				uni.setNavigationBarTitle({
+					title: title + "——物流信息"
+				})
+			}, 100);
+		},
 		methods: {
 			//判断哪个该展示关键字--还是默认
 			Type(item){

@@ -112,6 +112,7 @@
 		}, {
 			"path": "pages/order/order",
 			"style": {
+				"enablePullDownRefresh": true,
 				"navigationBarTitleText": "我的订单",
 				"app-plus": {
 					"bounce": "none"
@@ -185,6 +186,20 @@
 				"navigationBarTitleText": "商品列表"
 			}
         },
+		{
+            "path" : "pages/user/keep",
+            "style" : {
+				"enablePullDownRefresh": true,
+				"navigationBarTitleText": "我的收藏"
+			}
+        },
+		{
+		    "path" : "pages/set/aboutUs",
+		    "style" : {
+				"enablePullDownRefresh": true,
+				"navigationBarTitleText": "关于我们"
+			}
+		},
 		{
 		    "path" : "pages/chat/chat",
 		    "style" : {

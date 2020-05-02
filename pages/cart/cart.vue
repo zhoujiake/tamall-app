@@ -2,7 +2,7 @@
 	<view class="container">
 		<!-- 空白页 -->
 		<view v-if="!hasLogin || empty===true" class="empty">
-			<image src="/static/emptyCart.jpg" mode="aspectFit"></image>
+			<image src="/static/ic_carte0.png" mode="aspectFit"></image>
 			<view v-if="hasLogin" class="empty-tips">
 				{{lang.empty}}
 				<navigator class="navigator" v-if="hasLogin" url="../index/index" 
@@ -18,6 +18,7 @@
 			<view class="cart-list">
 				<block v-for="(item, index) in cartList" :key="item.cartItemId">
 					<view
+					    @click="navToDetailPage(item)"
 						class="cart-item" 
 						:class="{'b-b': index!==cartList.length-1}"
 					    >
@@ -37,8 +38,8 @@
 						</view>
 						<view class="item-right">
 							<text class="clamp title">{{item.goodsName}}</text>
-							<text class="attr">{{}}</text>
-							<text class="price">{{lang.moneyFlag + item.sellingPrice}}</text>
+							<!-- <text class="attr">{{}}</text> -->
+							<text class="price" style="margin-top: 20upx;">{{lang.moneyFlag + item.sellingPrice}}</text>
 							<uni-number-box 
 								class="step"
 								:min="1" 
@@ -68,13 +69,9 @@
 				</view>
 				<view class="total-box">
 					<text class="price">{{lang.moneyFlag + total}}</text>
-					<!-- <text class="coupon">
-						已优惠
-						<text></text>
-						元
-					</text> -->
 				</view>
-				<button type="primary" class="no-border confirm-btn" @click="createOrder">{{lang.settlement}}</button>
+				<button type="primary" class="no-border confirm-btn" @click="createOrder">{{lang.settlement}}
+				</button>
 			</view>
 		</view>
 	</view>
@@ -261,7 +258,15 @@
 						goodsData: goodsData
 					})}`
 				})
-			}
+			},
+			//列表详情页
+			navToDetailPage(item) {
+				//测试数据没有写id，用title代替
+				let id = item.goodsId;
+				uni.navigateTo({
+					url: `/pages/product/product?id=${id}`
+				})
+			},
 		}
 	}
 </script>

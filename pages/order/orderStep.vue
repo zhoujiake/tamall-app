@@ -73,12 +73,54 @@ export default {
 						 }
 						 // 按时间降序
 						 this.orderTracesData.Traces.sort(compare(`AcceptTime`))
-						 debugger
+						 // 显示快递
+						 let title = this.getShipperName(this.orderTracesData.ShipperCode)
+						 uni.setNavigationBarTitle({
+						 	title: title + "—物流信息"
+						 })
 					 } else {
 					 	// this.$api.msg(res.data.message);
 					 }
 			    }
 			});
+		},
+		getShipperName(code){
+			if ('ZTO' === code) {
+				return '中通快递';
+			}
+			if ('STO' === code) {
+				return '申通快递';
+			}
+			if ('YTO' === code) {
+				return '圆通速递';
+			}
+			if ('YD' === code) {
+				return '韵达速递';
+			}
+			if ('YZPY' === code) {
+				return '邮政快递包裹';
+			}
+			if ('EMS' === code) {
+				return 'EMS';
+			}
+			if ('HHTT' === code) {
+				return '天天快递';
+			}
+			if ('JD' === code) {
+				return '京东快递';
+			}
+			if ('UC' === code) {
+				return '优速快递';
+			}
+			if ('DBL' === code) {
+				return '德邦快递';
+			}
+			if ('ZJS' === code) {
+				return '宅急送';
+			}
+			if ('SF' === code) {
+				return '顺丰速运';
+			}
 		}
 	}
 };

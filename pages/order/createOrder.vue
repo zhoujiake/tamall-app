@@ -30,7 +30,7 @@
 						<text class="title clamp">{{item.goodsName}}</text>
 						<view class="price-box">
 							<text class="price">{{lang.moneyFlag + item.sellingPrice}}</text>
-							<text class="number">{{item.goodsCount}}</text>
+							<text class="number">x{{item.goodsCount}}</text>
 						</view>
 					</view>
 				</view>
@@ -38,7 +38,7 @@
 		</view>
 
 		<!-- 优惠明细 -->
-		<view class="yt-list">
+		<view class="yt-list" v-if="false">
 			<view class="yt-list-cell b-b" @click="toggleMask('show')">
 				<view class="cell-icon">
 					{{lang.coupon}}

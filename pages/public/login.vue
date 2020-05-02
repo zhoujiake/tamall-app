@@ -218,10 +218,6 @@
 											'city': infoRes.userInfo.city,
 											'countySeat': '',
 										}
-										var d = this.jimUserName
-										if (this.JIM.isLogin()) {
-											 this.getJPushData()
-										}
 									}
 									// 第三方用户登录 
 									uni.request({
@@ -236,6 +232,10 @@
 												debugger
 												this.login(res.data.data);
 												this.$api.msg('登录成功');
+												// JIM登录
+												if (!this.JIM.isLogin()) {
+													this.getJPushData()
+												}
 												uni.navigateBack();
 											} else {
 												this.$api.msg(res.data.message);
@@ -252,17 +252,6 @@
 			        }
 			    });
 			},
-			randomString(len) {
-			　　len = len || 32;
-			　　var $chars = 'ABCDEFGHJKMNPQRSTWXYZabcdefhijkmnprstwxyz0123456789';    
-			   /**** 默认去掉了容易混淆的字符oOLl,9gq,Vv,Uu,I1 ****/
-			　　var maxPos = $chars.length;
-			　　var pwd = '';
-			　　for (let i = 0; i < len; i++) {
-			　　　　pwd += $chars.charAt(Math.floor(Math.random() * maxPos));
-			　　}
-			　　return pwd;
-			}
 		},
 	}
 </script>

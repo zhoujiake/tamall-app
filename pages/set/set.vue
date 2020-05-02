@@ -1,26 +1,26 @@
 <template>
 	<view class="container">
-		<view class="list-cell b-b m-t" @click="navTo('')" hover-class="cell-hover" :hover-stay-time="50">
+	<!--<view class="list-cell b-b m-t" @click="navTo('')" hover-class="cell-hover" :hover-stay-time="50">
 			<text class="cell-tit">{{lang.userInfo}}</text>
 			<text class="cell-more yticon icon-you"></text>
-		</view>
-	<!-- 	<view class="list-cell b-b" @click="navTo('收货地址')" hover-class="cell-hover" :hover-stay-time="50">
+		</view> -->
+	<!--<view class="list-cell b-b" @click="navTo('收货地址')" hover-class="cell-hover" :hover-stay-time="50">
 			<text class="cell-tit">收货地址</text>
 			<text class="cell-more yticon icon-you"></text>
 		</view> -->
-	<!-- 	<view class="list-cell" @click="navTo('实名认证')" hover-class="cell-hover" :hover-stay-time="50">
+	<!--<view class="list-cell" @click="navTo('实名认证')" hover-class="cell-hover" :hover-stay-time="50">
 			<text class="cell-tit">实名认证</text>
 			<text class="cell-more yticon icon-you"></text>
 		</view> -->
-	<!-- 	<view class="list-cell m-t">
+	<!--<view class="list-cell m-t">
 			<text class="cell-tit">消息推送</text>
 			<switch checked color="#fa436a" @change="switchChange" />
 		</view> -->
-		<!-- <view class="list-cell m-t b-b" @click="navTo('清除缓存')" hover-class="cell-hover" :hover-stay-time="50">
+	<!--<view class="list-cell m-t b-b" @click="navTo('清除缓存')" hover-class="cell-hover" :hover-stay-time="50">
 			<text class="cell-tit">清除缓存</text>
 			<text class="cell-more yticon icon-you"></text>
 		</view> -->
-		<view class="list-cell b-b" @click="navTo('')" hover-class="cell-hover" :hover-stay-time="50">
+		<view class="list-cell b-b" @click="navTo('/pages/set/aboutUs')" hover-class="cell-hover" :hover-stay-time="50">
 			<text class="cell-tit">{{lang.abaotUs}}</text>
 			<text class="cell-more yticon icon-you"></text>
 		</view>
@@ -76,7 +76,9 @@
 		methods:{
 			...mapMutations(['logout']),
 			navTo(url){
-				this.$api.msg(``);
+				uni.navigateTo({
+					url: url
+				})
 			},
 			//退出登录
 			toLogout(){

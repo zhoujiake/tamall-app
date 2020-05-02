@@ -14,7 +14,6 @@
 					<text :class="{active: priceOrder === 2 && filterIndex === 2}" class="yticon icon-shang xia"></text>
 				</view>
 			</view>
-			<!-- <text class="cate-item yticon icon-fenlei1" @click="toggleCateMask('show')"></text> -->
 		</view>
 		<view class="goods-list">
 			<view 
@@ -28,7 +27,6 @@
 				<text class="title clamp">{{item.goodsName}}</text>
 				<view class="price-box">
 					<text class="price">{{lang.moneyFlag + item.sellingPrice}}</text>
-					<!-- <text>已售 {{item.sales}}</text> -->
 				</view>
 			</view>
 		</view>
@@ -122,7 +120,7 @@
 		},
 		methods: {
 			//加载分类
-			async loadCateList(fid, sid) {
+			async loadCateList(fid, sid){
 				let list = await this.$api.json('cateList');
 				let cateList = list.filter(item=>item.pid == fid);
 				

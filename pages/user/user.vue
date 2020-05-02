@@ -4,14 +4,14 @@
 		<view class="user-section">
 			<image class="bg" :src="userBg"></image>
 			<view class="user-info-box">
-				<view class="portrait-box" @tap="navTo">
+				<view class="portrait-box" @tap="navTo('/pages/userinfo/userinfo')">
 					<image class="portrait" :src="userInfo.avatar || '/static/missing-face.png'"></image>
 				</view>
 				<view class="info-box">
 					<text class="username">{{userInfo.nickName || lang.login}}</text>
 				</view>
 			</view>
-			<!-- <view class="vip-card-box">
+		<!--<view class="vip-card-box">
 				<image class="card-bg" src="/static/vip-card-bg.png" mode=""></image>
 			</view> -->
 		</view>
@@ -69,10 +69,10 @@
 				<list-cell icon="icon-dizhi" iconColor="#5fcda2" 
 				:title="lang.addresManage" @eventClick="navTo('/pages/address/address')"></list-cell>
 				
-				<list-cell icon="icon-shoucang_xuanzhongzhuangtai" 
+				<list-cell icon="icon-shoucang_xuanzhongzhuangtai" @eventClick="navTo('/pages/user/keep')"
 				iconColor="#54b4ef" :title="lang.myFavorite"></list-cell>
 				
-			<!-- 	<list-cell icon="icon-switch_lang" iconColor="#9789f7"
+			<!--<list-cell icon="icon-switch_lang" iconColor="#9789f7"
 				:title="lang.switchLanguage" tips=" " @eventClick="switchLang()"></list-cell> -->
 				
 				<list-cell icon="icon-shezhi1" iconColor="#e07472" 
@@ -154,12 +154,12 @@
 			 * navigator标签现在默认没有转场动画，所以用view
 			 */
 			navTo(url){
-				if(!this.hasLogin){
+				if(!this.hasLogin){ // 未登录时执行
 					url = '/pages/public/login';
 				}
-				uni.navigateTo({  
+				uni.navigateTo({
 					url
-				})  
+				}) 
 			}, 
 			/**
 			 *  会员卡下拉和回弹

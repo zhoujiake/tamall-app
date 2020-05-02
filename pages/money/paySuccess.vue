@@ -4,13 +4,16 @@
 		<text class="tit">{{lang.paySuccessful}}</text>
 		
 		<view class="btn-group">
-			<navigator url="/pages/order/order?state=0" open-type="redirect" class="mix-btn">{{lang.backToHomePage}}</navigator>
-			<navigator url="/pages/index/index" open-type="switchTab" class="mix-btn hollow">{{lang.showOrders}}</navigator>
+			<navigator url="/pages/order/order?state=0" open-type="redirect" class="mix-btn">
+			{{lang.backToHomePage}}</navigator>
+			<navigator url="/pages/index/index" open-type="switchTab" class="mix-btn hollow">
+			{{lang.showOrders}}</navigator>
 		</view>
 	</view>
 </template>
 
 <script>
+import {mapState, mapMutations} from 'vuex'; 
 	export default {
 		data() {
 			return {

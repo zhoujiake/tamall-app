@@ -1,86 +1,203 @@
 <template>
-	<view>
-		<view class="user-section">
-			<image class="bg" src="/static/user-bg.jpg"></image>
-			<text class="bg-upload-btn yticon icon-paizhao"></text>
-			<view class="portrait-box">
-				<image class="portrait" :src="userInfo.portrait || '/static/missing-face.png'"></image>
-				<text class="pt-upload-btn yticon icon-paizhao"></text>
-			</view>
+	<view class="container">
+		<view class="list-cell">
+			<text class="cell-tit">{{lang.nickName}}</text>
+			<text class="cell-tit">{{userInfo.nickName}}</text>
+		</view>
+		<view class="list-cell" v-if="userInfo.gender === 1">
+			<text class="cell-tit">{{lang.sex}}</text>
+			<text class="cell-tit">{{lang.male}}</text>
+		</view>
+		<view class="list-cell" v-else>
+			<text class="cell-tit">{{lang.sex}}</text>
+			<text class="cell-tit">{{lang.Female}}</text>
+		</view>
+		<view class="list-cell">
+			<text class="cell-tit">{{lang.userLoginName}}</text>
+			<text class="cell-tit">{{userInfo.loginName}}</text>
+		</view>
+		<view class="list-cell">
+			<text class="cell-tit">{{lang.province}}</text>
+			<text class="cell-tit">{{userInfo.province}}</text>
+		</view>
+		<view class="list-cell">
+			<text class="cell-tit">{{lang.city}}</text>
+			<text class="cell-tit">{{userInfo.city}}</text>
 		</view>
 	</view>
 </template>
 
 <script>
 	import {  
-	    mapState,  
-	    mapMutations  
-	} from 'vuex';  
+		mapState
+	} from 'vuex';
 	export default {
 		data() {
 			return {
-				
 			};
 		},
-		computed:{
-			...mapState(['userInfo']),
+		onLoad() {
+			//#ifdef APP-PLUS  
+			 this.currentVersion = this.lang.currentVersionFlag + plus.runtime.version  
+			//#endif
+			uni.setNavigationBarTitle({
+				title: this.lang.userInfo
+			})
+		},
+		computed: {
+			...mapState([
+				'lang',
+				'userInfo',
+			])
+		},
+		methods:{
+			navTo(url){
+				this.$api.msg(``);
+			},
+			//退出登录
+			toLogout(){
+				uni.showModal({
+					confirmText: this.lang.ok,
+					cancelText: this.lang.no,
+					content: this.lang.loginOutMessage,
+					success: (e)=>{
+						if(e.confirm){
+							this.logout();
+							setTimeout(()=>{
+								uni.navigateBack();
+							}, 200)
+						}
+					}
+				})
+			},
+			//switch
+			switchChange(e){
+				let statusTip = e.detail.value ? '打开': '关闭';
+				this.$api.msg(`${statusTip}消息推送`);
+			},
+			checkAppVersion() {
+				//#ifdef APP-PLUS  
+				var server = this.$baseUrl + "app-update"; //检查更新地址  
+				var req = { //升级检测数据  
+					"appid": plus.runtime.appid,  
+					"version": plus.runtime.versionCode  
+				};  
+				uni.request({  
+					url: server,  
+					data: req,  
+					success: (res) => {
+						if (res.statusCode == 200 && res.data.data.status === 1) {  
+							// this.show = true//提醒用户更新  
+							this.$refs['tip'].open()
+							this.appNote = res.data.data.note
+							this.appUrl = res.data.data.url
+						} else {
+							this.$api.msg(this.lang.ltestVersion)
+						}
+					}  
+				})
+				//#endif  
+			},
+			updateApp(type) {
+				if (type) {
+					plus.runtime.openURL(this.appUrl);
+					this.$refs['tip'].close()
+				}else{
+					this.$refs['tip'].close()
+				}
+			}
 		}
 	}
 </script>
 
-<style lang="scss">
+<style lang='scss'>
 	page{
 		background: $page-color-base;
 	}
-	.user-section{
+	.list-cell{
 		display:flex;
-		align-items:center;
-		justify-content: center;
-		height: 460upx;
-		padding: 40upx 30upx 0;
+		align-items:baseline;
+		padding: 20upx $page-row-spacing;
+		line-height:60upx;
 		position:relative;
-		.bg{
-			position:absolute;
-			left: 0;
-			top: 0;
-			width: 100%;
-			height: 100%;
-			filter: blur(1px);
-			opacity: .7;
+		background: #fff;
+		justify-content: center;
+		&.log-out-btn{
+			margin-top: 40upx;
+			.cell-tit{
+				color: $uni-color-primary;
+				text-align: center;
+				margin-right: 0;
+			}
 		}
-		.portrait-box{
-			width: 200upx;
-			height: 200upx;
-			border:6upx solid #fff;
-			border-radius: 50%;
-			position:relative;
-			z-index: 2;
+		&.cell-hover{
+			background:#fafafa;
 		}
-		.portrait{
-			position: relative;
-			width: 100%;
-			height: 100%;
-			border-radius: 50%;
+		&.b-b:after{
+			left: 30upx;
 		}
-		.yticon{
-			position:absolute;
-			line-height: 1;
-			z-index: 5;
-			font-size: 48upx;
-			color: #fff;
-			padding: 4upx 6upx;
-			border-radius: 6upx;
-			background: rgba(0,0,0,.4);
+		&.m-t{
+			margin-top: 16upx; 
 		}
-		.pt-upload-btn{
-			right: 0;
-			bottom: 10upx;
+		.cell-more{
+			align-self: baseline;
+			font-size:$font-lg;
+			color:$font-color-light;
+			margin-left:10upx;
 		}
-		.bg-upload-btn{
-			right: 20upx;
-			bottom: 16upx;
+		.cell-tit{
+			flex: 1;
+			font-size: $font-base + 2upx;
+			color: $font-color-dark;
+			margin-right:10upx;
+		}
+		.cell-tip{
+			font-size: $font-base;
+			color: $font-color-light;
+		}
+		switch{
+			transform: translateX(16upx) scale(.84);
 		}
 	}
-
-
+	/* 提示窗口 */
+	.uni-tip {
+		padding: 15px;
+		width: 300px;
+		background: #fff;
+		box-sizing: border-box;
+		border-radius: 10px;
+	}
+	
+	.uni-tip-title {
+		text-align: center;
+		font-weight: bold;
+		font-size: 16px;
+		color: #333;
+	}
+	
+	.uni-tip-content {
+		padding: 15px;
+		font-size: 14px;
+		color: #666;
+	}
+	
+	.uni-tip-group-button {
+		margin-top: 10px;
+		display: flex;
+	}
+	
+	.uni-tip-button {
+		width: 100%;
+		text-align: center;
+		font-size: 14px;
+		color: #3b4144;
+	}
+	
+	.uni-tip-button-confirm {
+		width: 100%;
+		text-align: center;
+		font-size: 14px;
+		color: #ffaa00;
+	}
+	
 </style>
