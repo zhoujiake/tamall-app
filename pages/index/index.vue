@@ -217,7 +217,8 @@
 			</view>
 		</view>
 		<uni-load-more :status="loadingType"></uni-load-more>
-		<uni-popup ref="tip" :type="type" :custom="true" :mask-click="false">
+		<!-- 版本更新提示语 -->
+		<uni-popup v-show="showVersionPupop" ref="tip" :type="type" :custom="true" :mask-click="false">
 			<view class="uni-tip">
 				<view class="uni-tip-title">{{lang.versionUpdate}}</view>
 				<view class="uni-tip-content">{{appNote}}</view>
@@ -254,6 +255,7 @@ import {mapState, mapMutations} from 'vuex';
 				cids : "108",
 				topImageUrl : '',
 				type: 'center',
+				showVersionPupop: false,
 				appNote: '',
 				appUrl: '',
 			};
@@ -263,7 +265,9 @@ import {mapState, mapMutations} from 'vuex';
 		  this.loadCarouselList();// 加载轮播图数据
 		  this.loadHotGoodsesList(); // 加载热销商品数据
 		  this.newGoodsesList(); // 加载新品数据
-		  this.loadRecommendGoodsesList(); // 加载推荐商品数据
+		  setTimeout(() => {
+			  this.loadRecommendGoodsesList(); // 加载推荐商品数据
+		  }, 1000);
 		  this.topImageUrl = 'http://39.107.231.238:8080/upload/indexImage/212221212.jpg'
 		  // 版本检查
 		  this.checkAppVersion()
@@ -464,13 +468,13 @@ import {mapState, mapMutations} from 'vuex';
 				var req = { //升级检测数据  
 					"appid": plus.runtime.appid,  
 					"version": plus.runtime.versionCode  
-				};  
-				uni.request({  
+				};
+				uni.request({
 					url: server,  
 					data: req,  
 					success: (res) => {
 						if (res.statusCode == 200 && res.data.data.status === 1) {  
-							// this.show = true//提醒用户更新  
+							this.showVersionPupop = true//提醒用户更新  
 							this.$refs['tip'].open()
 							this.appNote = res.data.data.note
 							this.appUrl = res.data.data.url
@@ -481,9 +485,11 @@ import {mapState, mapMutations} from 'vuex';
 			},
 			updateApp(type) {
 				if (type) {
+					this.showVersionPupop = false //提醒用户更新  
 					this.$refs['tip'].close()
 					plus.runtime.openURL(this.appUrl);
 				}else{
+					this.showVersionPupop = false //提醒用户更新 
 					this.$refs['tip'].close()
 				}
 			}
@@ -501,14 +507,6 @@ import {mapState, mapMutations} from 'vuex';
 			if (index === 0) { // 语言切换
 				this.changeLang()
 			} else if (index === 1) { // 消息
-				// #ifdef APP-PLUS
-				const pages = getCurrentPages();
-				const page = pages[pages.length - 1];
-				const currentWebview = page.$getAppWebview();
-				currentWebview.hideTitleNViewButtonRedDot({
-					index
-				});
-				// #endif
 				uni.navigateTo({
 					url: '/pages/notice/notice'
 				})

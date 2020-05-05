@@ -196,7 +196,6 @@
 		{
 		    "path" : "pages/set/aboutUs",
 		    "style" : {
-				"enablePullDownRefresh": true,
 				"navigationBarTitleText": "关于我们"
 			}
 		},

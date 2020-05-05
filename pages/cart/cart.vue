@@ -18,7 +18,6 @@
 			<view class="cart-list">
 				<block v-for="(item, index) in cartList" :key="item.cartItemId">
 					<view
-					    @click="navToDetailPage(item)"
 						class="cart-item" 
 						:class="{'b-b': index!==cartList.length-1}"
 					    >
@@ -36,7 +35,7 @@
 								@click="check('item', index)"
 							></view>
 						</view>
-						<view class="item-right">
+						<view class="item-right" @click="navToDetailPage(item)">
 							<text class="clamp title">{{item.goodsName}}</text>
 							<!-- <text class="attr">{{}}</text> -->
 							<text class="price" style="margin-top: 20upx;">{{lang.moneyFlag + item.sellingPrice}}</text>
@@ -252,7 +251,6 @@
 						})
 					}
 				})
-
 				uni.navigateTo({
 					url: `/pages/order/createOrder?data=${JSON.stringify({
 						goodsData: goodsData

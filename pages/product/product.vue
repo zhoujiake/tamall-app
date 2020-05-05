@@ -103,6 +103,10 @@
 			</view>
 			<rich-text class="rich-view" :nodes="desc"></rich-text>
 		</view>
+		<view class="page-chat-button-mm">
+			<image src="../../static/ic_weixin.png" @click="toChatTencent()"></image>
+			<text>{{lang.wechat}}</text>
+		</view>
 		<view class="page-chat-button">
 			<image src="../../static/ic_contact.png" @click="toChatPage()"></image>
 		</view>
@@ -276,7 +280,6 @@
 						this.specSelected.push(item); 
 					} 
 				})
-				
 			},
 			//分享
 			share(){
@@ -292,22 +295,6 @@
 				} else {
 					this.favorite = !this.favorite;
 				}
-			},
-			buy(){
-				// 提交订单
-				let goodsData = [];
-				goodsData.push({
-					goodsId: this.goods.goodsId,
-					goodsName: this.goods.goodsName,
-					goodsCount: this.goods.goodsCount,
-					goodsCoverImg: this.goods.goodsCoverImg,
-					sellingPrice: this.goods.sellingPrice,
-				})
-				uni.navigateTo({
-					url: `/pages/order/createOrder?data=${JSON.stringify({
-						goodsData: goodsData
-					})}`
-				})
 			},
 			stopPrevent(){},
 			toChatPage(){
@@ -331,6 +318,41 @@
 					url:`/pages/chat/chat?username=${this.jimUserName}&avatar=${""}&nickName=${this.jimNickName}`
 				})
 			},
+			// 跳转到微信
+			toChatTencent(){
+				let number = this.$wechatNumber;
+				uni.setClipboardData({
+				    data: number,
+				    success: () => {
+						setTimeout(()=> {
+							uni.showModal({
+								confirmText: this.lang.jumpAsk,
+								cancelText: this.lang.no,
+								content: number + ' ' + this.lang.jumpTowechatMsg,
+								success: (e)=>{
+									if(e.confirm){
+										let _this = this;
+										// 判断平台
+										if (plus.os.name == 'Android') {
+											plus.runtime.launchApplication({
+													pname: 'com.tencent.mm'
+												},
+												function(e) {
+													console.log('Open system default browser failed: ' + e.message);
+												}
+											);
+										} else if (plus.os.name == 'iOS') {
+											plus.runtime.launchApplication({ action: 'weixin://' }, function(e) {
+												console.log('Open system default browser failed: ' + e.message);
+											});
+										}
+									}
+								}
+							})
+						}, 1000);
+				    }
+				});
+			},
 			addShopCart(isBuyAcation) {
 				var data = {
 						'goodsId': this.goods.goodsId, 
@@ -347,7 +369,10 @@
 				    success: (res) => {
 						 if (res.data.resultCode == 200) {
 							 if (isBuyAcation) {
-								this.buy()
+								 // 提交订单
+								uni.navigateTo({
+									url: `/pages/order/createOrder`
+								})
 							 } else {
 								var msg = this.lang.addToShopCartSuccess
 								uni.showToast({
@@ -875,6 +900,30 @@
 			}
 		}
 	}
+	.page-chat-button-mm {
+		position:fixed;
+		right: 36upx;
+		bottom:280upx;
+		z-index: 95;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		width: 120upx;
+		height: 100upx;
+		background: rgba(255,255,255,.9);
+		box-shadow: 0 0 20upx 0 rgba(0,0,0,.5);
+		border-radius: 16upx;
+		padding-right: 10upx;
+		
+		image{
+			padding: 14upx;
+			width: 120upx;
+			height: 70upx;
+		}
+		text{
+			font-size: 16upx;
+		}
+	}
 	.page-chat-button {
 		position:fixed;
 		right: 36upx;
@@ -891,8 +940,9 @@
 		
 		image{
 			padding: 14upx;
-			width: 120upx;
-			height: 100upx;
+			width: 110upx;
+			height: 90upx;
 		}
 	}
+	
 </style>

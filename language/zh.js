@@ -167,4 +167,7 @@ module.exports = {
 	distribution: '配货完成', 
 	shipped: '出库成功',
 	afterSaleInOrder: '交易成功',
+	wechat: '微信',
+	jumpTowechatMsg: '微信号已复制，可在微信添加好友中粘贴微信号进行问价，是否要进入微信？',
+	jumpAsk: '是',
 }

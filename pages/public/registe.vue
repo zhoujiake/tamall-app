@@ -35,10 +35,10 @@
 					<view class="gender-radio">
 						<radio-group name="gender" >
 							<label style="margin-right: 20upx;">
-								<radio value="1" /><text>{{lang.male}}</text>
+								<radio color="#3d738a" value="1"/><text>{{lang.male}}</text>
 							</label>
 							<label>
-								<radio value="2" /><text>{{lang.Female}}</text>
+								<radio color="#3d738a" value="2"/><text>{{lang.Female}}</text>
 							</label>
 						</radio-group>
 					</view>
@@ -46,7 +46,7 @@
 						<text class="tit">{{lang.email}}</text>
 						<input
 						    name="email"
-							type="text" 
+							type="text"
 							:placeholder="lang.inputEmail"
 							placeholder-class="input-empty"
 							maxlength="30"
@@ -284,7 +284,7 @@
 		line-height: 76upx;
 		border-radius: 50px;
 		margin-top: 70upx;
-		background: $uni-color-primary;
+		background: #3d738a;
 		color: #fff;
 		font-size: $font-lg;
 		&:after{
@@ -314,8 +314,8 @@
 		display: flex;
 		flex-direction: column;
 		align-items: flex-start;
-		margin-top: -20upx;
+		margin-top: -30upx;
 		margin-bottom: 20upx;
-		margin-right: 10upx;
+		margin-left: 10upx;
 	}
 </style>

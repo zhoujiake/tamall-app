@@ -60,8 +60,8 @@
 						<view class="price-box">
 							{{lang.count}}
 							<text class="num">{{item.newBeeMallOrderItemVOS.length}}</text>
-							 {{lang.orderItemsCount + lang.discountedPrice}}
-							<text class="price">{{item.totalPrice}}</text>
+							<!-- {{lang.orderItemsCount + lang.discountedPrice}} -->
+							<text class="price">{{lang.payTotoal + " "+item.totalPrice}}</text>
 						</view>
 						
 						<view class="action-box b-t" v-if="item.orderStatus == 0">
@@ -484,11 +484,14 @@
 				padding: 0 30upx 0 24upx;
 				overflow: hidden;
 				.title{
-					font-size: $font-base + 2upx;
+					padding-top: 6upx;
+					height: 40upx;
+					font-size: $font-base + 0upx;
 					color: $font-color-dark;
 					line-height: 1;
 				}
 				.attr-box{
+					height: 44upx;
 					font-size: $font-sm + 2upx;
 					color: $font-color-light;
 					padding: 10upx 12upx;

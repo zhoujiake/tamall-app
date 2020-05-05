@@ -46,7 +46,7 @@ const store = new Vuex.Store({
 		jimNickName : 'ཨ་ཁྲོམ།',
 		chatVueObject : null
 	},
-	mutations: { 
+	mutations: {
 		login(state, provider) {
 			state.hasLogin = true;
 			state.userInfo = provider;
@@ -201,9 +201,7 @@ const store = new Vuex.Store({
 															uni.setStorageSync(data.messages[i].from_username, records)
 														} else {
 															let newRecord = []
-															data.messages.forEach((item) => {
-																newRecord.push(item)
-															})
+															newRecord.push(data.messages[i])
 															// 保存
 															uni.setStorageSync(data.messages[i].from_username, newRecord)
 														}
@@ -284,15 +282,66 @@ const store = new Vuex.Store({
 										// 获取已有的消息记录
 										data[i].msgs.forEach((item) => {
 											let flag = false
-											for (let i = 0; i < records.length; i++) {
+											let length = records.length
+											for (let i = 0; i < length; i++) {
 												// 如果有重复的消息，则替换数据并跳出改for循环
 												if (records[i].msg_id === item.msg_id) {
-												    records.splice(i,i,item)
 													flag = true
 												}
 											}
-											if (!flag) { // 如果没有重复的则执行添加操作
-												records.push(item)
+											debugger
+											// 如果没有重复的则执行添加操作 （不包括当前用户的）
+											if (!flag & item.content.from_id !== state.userInfo.loginName) {
+												// 图片类型
+												if (item.content.msg_type === "image") {
+														state.JIM.getResource({
+														  'media_id' : item.content.msg_body.media_id
+														}).onSuccess(data2 => {
+															// 下载文件
+															uni.downloadFile({
+															  url: data2.url, //仅为示例，并非真实的资源
+															  success: res => {
+																  if (res.statusCode === 200) {
+																	uni.saveFile({
+																		tempFilePath: res.tempFilePath,
+																		success: (res) => {
+																			item.content.msg_body.media_id = res.savedFilePath
+																			var records = uni.getStorageSync(data[i].from_username)
+																			if (records) { // 如果有这个买家的消息记录，则执行。
+																				records.push(item)
+																				// 原保存回去
+																				uni.setStorageSync(data[i].from_username, records)
+																			} else {
+																				let newRecord = []
+																					newRecord.push(item)
+																				// 保存
+																				uni.setStorageSync(data[i].from_username, newRecord)
+																			}
+																			state.conversations.forEach( item => {
+																				 if (item.username === data[i].from_username) {
+																					 let c = item.unread_msg_count + 1
+																					 state.JIM.updateConversation({
+																						 'username' : data[i].from_username,
+																						 'extras' : {'unreadCount': c}
+																						});
+																				 }
+																			})
+																			setTimeout(() => {
+																				// 更新会话记录
+																				this.commit('updateConversation')
+																			},2000)
+																	}
+																	  });
+																  }
+															  }
+															});
+														}).onFail(function(data) {
+														  data.code // 返回码
+														  //data.message 描述
+														});
+												} else {
+													records.push(item)
+												}
 											}
 										})
 										// 原保存回去
