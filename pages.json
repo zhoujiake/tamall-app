@@ -13,7 +13,7 @@
 						"searchInput": {
 							"backgroundColor": "rgba(231, 231, 231,.7)",
 							"borderRadius": "16px",
-							"placeholder": "ཚོང་ཟོག་འཚོལ་གཤེར།",
+							"placeholder": "搜索商品 ཚོང་ཟོག་འཚོལ་གཤེར།",
 							"disabled": true,
 							"placeholderColor": "#606266"
 						},

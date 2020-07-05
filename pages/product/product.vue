@@ -2,7 +2,7 @@
 	<view class="container">
 		<view class="carousel">
 			<swiper indicator-dots circular=true duration="400">
-				<swiper-item class="swiper-item" v-for="(item,index) in goods.goodsCarouselList" :key="index">
+				<swiper-item class="swiper-item" v-for="(item, index) in goods.goodsCarouselList" :key="index">
 					<view class="image-wrapper">
 						<image
 							:src="item" 
@@ -16,7 +16,13 @@
 		</view>
 		
 		<view class="introduce-section">
-			<text class="title">{{goods.goodsName}}</text>
+			<text v-if="userLang === 'tb'" class="title">
+				{{switchLanguageForString(goods.goodsName, 0)}}
+			</text>
+			<text v-else class="title">
+				{{switchLanguageForString(goods.goodsName, 1)}}
+			</text>
+			
 			<view class="price-box">
 				<text class="price-tip">{{lang.moneyFlag}}</text>
 				<text class="price">{{goods.sellingPrice}}</text>
@@ -48,7 +54,12 @@
 			<view class="c-row b-b">
 				<text class="tit">{{lang.introduction}}</text>
 				<view class="bz-list con">
-					<text>{{goods.goodsIntro}}</text>
+					<text v-if="userLang === 'tb'">
+						{{switchLanguageForString(goods.goodsIntro, 0)}}
+					</text>
+					<text v-else>
+						{{switchLanguageForString(goods.goodsIntro, 1)}}
+					</text>
 				</view>
 			</view>
 		<!-- 	<view v-show="false" class="c-row b-b" @click="toggleSpec">
@@ -199,8 +210,7 @@
 				desc: ``,
 				specList: [
 				],
-				specChildList: [
-				],
+				specChildList: [],
 			};
 		},
 		async onLoad(options) {
@@ -228,7 +238,8 @@
 				'jimUserName',
 				'jimNickName',
 				'JIM',
-				'hasLogin'
+				'hasLogin',
+				'userLang'
 			])
 		},
 		methods:{
@@ -394,7 +405,16 @@
 					current:index,
 					urls: this.goods.goodsCarouselList
 				});
-			}
+			},
+			// 分类名称语言切换
+			switchLanguageForString(str, index){
+				if(str.indexOf("|") == -1) {
+					return str
+				} else {
+					var arr = str.split('|');
+					return arr[index];
+				}
+			},
 		},
 
 	}

@@ -54,9 +54,9 @@ const prePage = () => {
 	return prePage.$vm;
 }
 
-const baseUrl = 'http://192.168.43.128:28089/scoa/';
+// const baseUrl = 'http://192.168.43.128:28089/scoa/';
 // const baseUrl = 'http://192.168.0.100:28089/scoa/';
-// const baseUrl = 'http://139.155.87.66:8080/scoa/';
+const baseUrl = 'http://139.155.87.66:8080/scoa/';
 // const baseUrl = 'http://v31185380n.qicp.vip/scoa/';
 // 微信联系方式
 const wechatNumber = '13884059500';

@@ -36,7 +36,14 @@
 							></view>
 						</view>
 						<view class="item-right" @click="navToDetailPage(item)">
-							<text class="clamp title">{{item.goodsName}}</text>
+							
+							<text v-if="userLang === 'tb'" class="title clamp">
+								{{switchLanguageForString(item.goodsName, 0)}}
+							</text>
+							<text v-else class="title clamp">
+								{{switchLanguageForString(item.goodsName, 1)}}
+							</text>
+							
 							<!-- <text class="attr">{{}}</text> -->
 							<text class="price" style="margin-top: 20upx;">{{lang.moneyFlag + item.sellingPrice}}</text>
 							<uni-number-box 
@@ -117,7 +124,7 @@
 			}
 		},
 		computed:{
-			...mapState(['hasLogin', 'lang'])
+			...mapState(['hasLogin', 'lang','userLang'])
 		},
 		methods: {
 			//请求数据
@@ -264,6 +271,15 @@
 				uni.navigateTo({
 					url: `/pages/product/product?id=${id}`
 				})
+			},
+			// 分类名称语言切换
+			switchLanguageForString(str, index){
+				if(str.indexOf("|") == -1) {
+					return str
+				} else {
+					var arr = str.split('|');
+					return arr[index];
+				}
 			},
 		}
 	}

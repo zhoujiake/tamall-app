@@ -170,4 +170,5 @@ module.exports = {
 	wechat: '微信',
 	jumpTowechatMsg: '微信号已复制，可在微信添加好友中粘贴微信号进行问价，是否要进入微信？',
 	jumpAsk: '是',
+	noMore: '已经到底了...',
 }

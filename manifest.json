@@ -3,7 +3,7 @@
     "appid" : "__UNI__4074EA1",
     "description" : "",
     "versionName" : "1.0.0",
-    "versionCode" : 2,
+    "versionCode" : 3,
     "transformPx" : false,
     "app-plus" : {
         /* 5+App特有相关 */
@@ -15,10 +15,10 @@
             "delay" : 0
         },
         "modules" : {
-            "Payment" : {},
             "Push" : {},
             "Speech" : {},
-            "OAuth" : {}
+            "OAuth" : {},
+            "Payment" : {}
         },
         /* 模块配置 */
         "distribute" : {
@@ -61,13 +61,13 @@
                     "weixin" : {
                         "appid" : "wx764ded0b6c2dfbbc",
                         "appsecret" : "57d80aff44e5015e376740814d96ebda",
-                        "UniversalLinks" : ""
+                        "UniversalLinks" : "https://www.tamall.ltd"
                     }
                 },
                 "payment" : {
                     "weixin" : {
                         "appid" : "wx764ded0b6c2dfbbc",
-                        "UniversalLinks" : ""
+                        "UniversalLinks" : "https://www.tamall.ltd"
                     }
                 },
                 "maps" : {},
@@ -113,6 +113,35 @@
                     "hdpi" : "",
                     "xhdpi" : "",
                     "xxhdpi" : "unpackage/res/android/3.9.png"
+                },
+                "ios" : {
+                    "iphone" : {
+                        "portrait-896h@3x" : "unpackage/res/android/3.9.png",
+                        "landscape-896h@3x" : "unpackage/res/android/3.9.png",
+                        "portrait-896h@2x" : "unpackage/res/android/3.9.png",
+                        "landscape-896h@2x" : "unpackage/res/android/3.9.png",
+                        "iphonex" : "unpackage/res/android/3.9.png",
+                        "iphonexl" : "unpackage/res/android/3.9.png",
+                        "retina55" : "unpackage/res/android/3.9.png",
+                        "retina55l" : "unpackage/res/android/3.9.png",
+                        "retina47" : "unpackage/res/android/3.9.png",
+                        "retina47l" : "unpackage/res/android/3.9.png",
+                        "retina40" : "unpackage/res/android/3.9.png",
+                        "retina40l" : "unpackage/res/android/3.9.png",
+                        "retina35" : "unpackage/res/android/3.9.png"
+                    },
+                    "ipad" : {
+                        "portrait-1366h@2x" : "unpackage/res/android/3.9.png",
+                        "landscape-1366h@2x" : "unpackage/res/android/3.9.png",
+                        "portrait-1194h@2" : "unpackage/res/android/3.9.png",
+                        "landscape-1194h@2x" : "unpackage/res/android/3.9.png",
+                        "portrait-1112h@2x" : "unpackage/res/android/3.9.png",
+                        "landscape-1112h@2x" : "unpackage/res/android/3.9.png",
+                        "portrait-retina7" : "unpackage/res/android/3.9.png",
+                        "landscape-retina7" : "unpackage/res/android/3.9.png",
+                        "portrait7" : "unpackage/res/android/3.9.png",
+                        "landscape7" : "unpackage/res/android/3.9.png"
+                    }
                 }
             }
         }

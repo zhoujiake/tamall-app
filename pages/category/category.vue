@@ -1,17 +1,32 @@
 <template>
 	<view class="content">
 		<scroll-view scroll-y class="left-aside">
-			<view v-for="item in flist" :key="item.id" class="f-item b-b" :class="{active: item.id === currentId}" @click="tabtap(item)">
-				{{item.name}}
+			<view  v-for="item in flist" :key="item.id" class="f-item b-b" :class="{active: item.id === currentId}" @click="tabtap(item)">
+				<template v-if="userLang === 'tb'">
+					{{switchLanguageForString(item.name, 0)}}
+				</template>
+				<template v-else>
+					{{switchLanguageForString(item.name, 1)}}
+				</template>
 			</view>
 		</scroll-view>
 		<scroll-view scroll-with-animation scroll-y class="right-aside" @scroll="asideScroll" :scroll-top="tabScrollTop">
 			<view v-for="item in slist" :key="item.id" class="s-list" :id="'main-'+item.id">
-				<text class="s-item">{{item.name}}</text>
+				<text v-if="userLang === 'tb'" class="s-item">
+					{{switchLanguageForString(item.name, 0)}}
+				</text>
+				<text v-else class="s-item">
+					{{switchLanguageForString(item.name, 1)}}
+				</text>
 				<view class="t-list">
 					<view @click="navToList(item.id, titem.id)" v-if="titem.pid === item.id" class="t-item" v-for="titem in tlist" :key="titem.id">
 						<image :src="titem.picture"></image>
-						<text>{{titem.name}}</text>
+						<text v-if="userLang === 'tb'">
+							{{switchLanguageForString(titem.name, 0)}}
+						</text>
+						<text v-else>
+							{{switchLanguageForString(titem.name, 1)}}
+						</text>
 					</view>
 				</view>
 			</view>
@@ -44,13 +59,14 @@
 			var title = this.lang.goodsType;
 			setTimeout(function() {
 				uni.setNavigationBarTitle({
-						title: title
+					title: title
 				});
 			},300)
 		},
 		computed:{
 			...mapState([
-				'lang'
+				'lang',
+				'userLang'
 			])
 		},
 		methods: {
@@ -91,7 +107,6 @@
 					}
 				});
 			},
-			
 			//一级分类点击
 			tabtap(item) {	
 				if(!this.sizeCalcState) {
@@ -131,6 +146,15 @@
 				uni.navigateTo({
 					url: `/pages/product/list?fid=${this.currentId}&sid=${sid}&tid=${tid}`
 				})
+			},
+			// 分类名称语言切换
+			switchLanguageForString(str, index){
+				if(str.indexOf("|") == -1) {
+					return str
+				} else {
+					var arr = str.split('|');
+					return arr[index];
+				}
 			}
 		}
 	}

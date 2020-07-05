@@ -41,7 +41,8 @@
 							<view
 								v-for="(goodsItem, goodsIndex) in item.newBeeMallOrderItemVOS" :key="goodsIndex"
 								class="goods-item">
-								<image class="goods-img" :src="goodsItem.goodsCoverImg" mode="aspectFill"></image>
+								<image class="goods-img" :src="goodsItem.goodsCoverImg" @tap="showPic(goodsIndex, item)"
+								mode="aspectFill"></image>
 							</view>
 						</scroll-view>
 						<view 
@@ -49,9 +50,17 @@
 							class="goods-box-single"
 							v-for="(goodsItem, goodsIndex) in item.newBeeMallOrderItemVOS" :key="goodsIndex">
 							
-							<image class="goods-img" :src="goodsItem.goodsCoverImg" mode="aspectFill"></image>
+							<image class="goods-img" :src="goodsItem.goodsCoverImg" @tap="showPic(goodsIndex, item)"
+							mode="aspectFill"></image>
 							<view class="right">
-								<text class="title clamp">{{goodsItem.goodsName}}</text>
+								
+								<text v-if="userLang === 'tb'" class="title clamp">
+									{{switchLanguageForString(goodsItem.goodsName, 0)}}
+								</text>
+								<text v-else class="title clamp">
+									{{switchLanguageForString(goodsItem.goodsName, 1)}}
+								</text>
+								
 								<text class="attr-box">{{goodsItem.goodsCount}}</text>
 								<text class="price">{{lang.moneyFlag + goodsItem.sellingPrice}}</text>
 							</view>
@@ -158,7 +167,7 @@
 			uni.startPullDownRefresh();
 		},
 		computed: {
-			...mapState(['lang'])						
+			...mapState(['lang','userLang'])						
 		},
 		// 下拉刷新
 		onPullDownRefresh(){
@@ -360,7 +369,28 @@
 				   	trans = this.lang.afterSaleInOrder;
 					return trans
 				}
-			}
+			},
+			// 显示图片
+			showPic(index, item) {
+				let urls = []
+				item.newBeeMallOrderItemVOS.forEach(item => {
+					urls.push(item.goodsCoverImg)
+				})
+				uni.previewImage({
+					indicator:"none",
+					current:index,
+					urls: urls
+				});
+			},
+			// 分类名称语言切换
+			switchLanguageForString(str, index){
+				if(str.indexOf("|") == -1) {
+					return str
+				} else {
+					var arr = str.split('|');
+					return arr[index];
+				}
+			},
 		},
 	}
 </script>

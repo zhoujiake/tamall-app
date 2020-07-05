@@ -26,7 +26,14 @@
 				<view class="g-item">
 					<image :src="item.goodsCoverImg"></image>
 					<view class="right">
-						<text class="title clamp">{{item.goodsName}}</text>
+						
+						<text v-if="userLang === 'tb'" class="title clamp">
+							{{switchLanguageForString(item.goodsName, 0)}}
+						</text>
+						<text v-else class="title clamp">
+							{{switchLanguageForString(item.goodsName, 1)}}
+						</text>
+						
 						<view class="price-box">
 							<text class="price">{{lang.moneyFlag + item.sellingPrice}}</text>
 							<text class="number">x{{item.goodsCount}}</text>
@@ -146,7 +153,7 @@
 			this.remarkPlaceholder = this.lang.pleaseFillInTheNoteInformation
 		},
 		computed:{
-			...mapState(['lang'])
+			...mapState(['lang','userLang'])
 		},
 		methods: {
 			//显示优惠券面板
@@ -197,7 +204,16 @@
 				    }
 				});
 			},
-			stopPrevent(){}
+			stopPrevent(){},
+			// 分类名称语言切换
+			switchLanguageForString(str, index){
+				if(str.indexOf("|") == -1) {
+					return str
+				} else {
+					var arr = str.split('|');
+					return arr[index];
+				}
+			},
 		}
 	}
 </script>

@@ -20,11 +20,22 @@
 				<view :style="{background:color}"></view>
 			</view>
 		</view>
-		<text class="uni-load-more__text" :style="{color:color}">{{status === 'more' ? contentText.contentdown : (status === 'loading' ? contentText.contentrefresh : contentText.contentnomore)}}</text>
+		<text class="uni-load-more__text" :style="{color:color}">
+		{{status === 'more' 
+			?  
+		switchLanguageForString(contentText.contentdown) 
+			: 
+		(status === 'loading' 
+			?  
+		switchLanguageForString(contentText.contentrefresh) 
+			: 
+		switchLanguageForString(contentText.contentnomore))}}
+		</text>
 	</view>
 </template>
 
 <script>
+import {mapState} from 'vuex'; 
 	export default {
 		name: "uni-load-more",
 		props: {
@@ -45,15 +56,39 @@
 				type: Object,
 				default () {
 					return {
-						contentdown: "ཡར་འཐེན་གསལ་མཚོན་མང་བ།",
-						contentrefresh: "སྣོན་བཞིན་པ ༚༚༚༚༚ ",
-						contentnomore: "གྲངས་ཚིགས་གཞན་མེད་དོ།།"
+						contentdown: "ཡར་འཐེན་གསལ་མཚོན་མང་བ།|上拉加载更多",
+						contentrefresh: "སྣོན་བཞིན་པ ༚༚༚༚༚ |加载中...",
+						contentnomore: "གྲངས་ཚིགས་གཞན་མེད་དོ།།|没有更多了"
 					};
 				}
 			}
 		},
 		data() {
-			return {}
+			return {
+				noMore : ''
+			}
+		},
+		computed: {
+			...mapState([
+				'userLang'
+			])
+		},
+		onLoad(){
+		},
+		methods:{
+			// 分类名称语言切换
+			switchLanguageForString(str){
+				if(str.indexOf("|") == -1) {
+					return str
+				} else {
+					var arr = str.split('|');
+					if (this.userLang === 'tb') {
+						return arr[0];
+					} else {
+						return arr[1];
+					}
+				}
+			}
 		}
 	}
 </script>

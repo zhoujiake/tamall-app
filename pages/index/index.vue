@@ -97,7 +97,12 @@
 					<view class="g-item left" @click="navToHotGoodsDetailPage(index)">
 						<image :src="item.goodsCoverImg" mode="aspectFill"></image>
 						<view class="t-box">
-							<text class="title clamp">{{item.goodsName}}</text>
+							<text v-if="userLang === 'tb'" class="title clamp">
+								{{switchLanguageForString(item.goodsName, 0)}}
+							</text>
+							<text v-else class="title clamp">
+								{{switchLanguageForString(item.goodsName, 1)}}
+							</text>
 							<view class="price-box">
 								<text class="price">{{lang.moneyFlag + item.sellingPrice}}</text> 
 								<text class="m-price">{{lang.moneyFlag + item.originalPrice}}</text> 
@@ -108,7 +113,13 @@
 					<view class="g-item right" @click="navToHotGoodsDetailPage(index+1)">
 						<image :src="hotGoodsList[index+1].goodsCoverImg" mode="aspectFill"></image>
 						<view class="t-box">
-							<text class="title clamp">{{hotGoodsList[index+1].goodsName}}</text>
+							<text v-if="userLang === 'tb'" class="title clamp">
+								{{switchLanguageForString(hotGoodsList[index+1].goodsName, 0)}}
+							</text>
+							<text v-else class="title clamp">
+								{{switchLanguageForString(hotGoodsList[index+1].goodsName, 1)}}
+							</text>
+							
 							<view class="price-box">
 								<text class="price">{{lang.moneyFlag + hotGoodsList[index+1].sellingPrice}}</text> 
 								<text class="m-price">{{lang.moneyFlag + hotGoodsList[index+1].originalPrice}}</text> 
@@ -141,7 +152,14 @@
 						@click="navToDetailPage(item)"
 					>
 						<image :src="item.goodsCoverImg" mode="aspectFill"></image>
-						<text class="title clamp">{{item.goodsName}}</text>
+						
+						<text v-if="userLang === 'tb'" class="title clamp">
+							{{switchLanguageForString(item.goodsName, 0)}}
+						</text>
+						<text v-else class="title clamp">
+							{{switchLanguageForString(item.goodsName, 1)}}
+						</text>
+						
 						<text class="price">{{lang.moneyFlag + item.sellingPrice}}</text>
 					</view>
 					<!-- <view class="more">
@@ -162,7 +180,14 @@
 						@click="navToDetailPage(item)"
 						>
 						<image :src="item.goodsCoverImg" mode="aspectFill"></image>
-						<text class="title clamp">{{item.goodsName}}</text>
+						
+						<text v-if="userLang === 'tb'" class="title clamp">
+							{{switchLanguageForString(item.goodsName, 0)}}
+						</text>
+						<text v-else class="title clamp">
+							{{switchLanguageForString(item.goodsName, 1)}}
+						</text>
+						
 						<text class="price">{{lang.moneyFlag + item.sellingPrice}}</text>
 					</view>
 					<!-- <view class="more">
@@ -212,7 +237,14 @@
 				<view class="image-wrapper">
 					<image :src="item.goodsCoverImg" mode="aspectFill"></image>
 				</view>
-				<text class="title clamp">{{item.goodsName}}</text>
+				
+				<text v-if="userLang === 'tb'" class="title clamp">
+					{{switchLanguageForString(item.goodsName, 0)}}
+				</text>
+				<text v-else class="title clamp">
+					{{switchLanguageForString(item.goodsName, 1)}}
+				</text>
+				
 				<text class="price">{{lang.moneyFlag + item.sellingPrice}}</text>
 			</view>
 		</view>
@@ -265,12 +297,12 @@ import {mapState, mapMutations} from 'vuex';
 		  this.loadCarouselList();// 加载轮播图数据
 		  this.loadHotGoodsesList(); // 加载热销商品数据
 		  this.newGoodsesList(); // 加载新品数据
+		  // 版本检查
+		  this.checkAppVersion()
 		  setTimeout(() => {
 			  this.loadRecommendGoodsesList(); // 加载推荐商品数据
 		  }, 1000);
 		  this.topImageUrl = 'http://39.107.231.238:8080/upload/indexImage/212221212.jpg'
-		  // 版本检查
-		  this.checkAppVersion()
 		},
 		onUnload() {
 			console.log("JIM loginOut ----->>")
@@ -310,7 +342,8 @@ import {mapState, mapMutations} from 'vuex';
 			...mapState([
 				'lang',
 				'deviceInfo',
-				'JIM'
+				'JIM',
+				'userLang'
 			])
 		},
 		methods: {
@@ -421,6 +454,15 @@ import {mapState, mapMutations} from 'vuex';
 					}
 				});
 			},
+			// 分类名称语言切换
+			switchLanguageForString(str, index){
+				if(str.indexOf("|") == -1) {
+					return str
+				} else {
+					var arr = str.split('|');
+					return arr[index];
+				}
+			},
 			/**
 			 * 推荐商品
 			 */
@@ -476,7 +518,13 @@ import {mapState, mapMutations} from 'vuex';
 						if (res.statusCode == 200 && res.data.data.status === 1) {  
 							this.showVersionPupop = true//提醒用户更新  
 							this.$refs['tip'].open()
-							this.appNote = res.data.data.note
+							if(res.data.data.note) {
+								if (this.userLang === 'tb') {
+									this.appNote = this.switchLanguageForString(res.data.data.note, 0)
+								} else {
+									this.appNote = this.switchLanguageForString(res.data.data.note, 1)
+								}								
+							}
 							this.appUrl = res.data.data.url
 						}  
 					}  

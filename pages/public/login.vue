@@ -310,6 +310,7 @@
 		color: $font-color-dark;
 	}
 	.left-top-sign{
+		margin-top: 40upx;
 		font-size: 120upx;
 		color: $page-color-base;
 		position:relative;
@@ -333,6 +334,8 @@
 		text-shadow: 1px 0px 1px rgba(0,0,0,.3);
 	}
 	.input-content{
+		margin-top: 40upx;
+		margin-top: 40upx;
 		padding: 0 60upx;
 		z-index: 10;
 	}

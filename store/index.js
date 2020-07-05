@@ -12,7 +12,7 @@ try {
 	if(!userLang) {
 		const sys = uni.getSystemInfoSync();
 		//userLang = sys.language;
-		userLang = "tb"; // 默认显示藏文
+		userLang = "zh"; // 默认显示简体中文
 		//userLang = "en"; // 默认显示藏文
 	}
 	console.log(userLang);
@@ -20,9 +20,9 @@ try {
 	// 然后扩展语言包即可
 	if(userLang.substring(0,2) == 'zh') {
 		var lang = require('../language/zh.js');
-	}else if(userLang.substring(0,2) == 'tb') {
+	}else if (userLang.substring(0,2) == 'tb') {
 		var lang = require('../language/tb.js');
-	}else{
+	}else {
 		var lang = require('../language/en.js');
 	}
 } catch (e) {
@@ -36,6 +36,7 @@ const store = new Vuex.Store({
 		authPayload: {},
 		userInfo: {},
 		lang : lang,
+		userLang : userLang,
 		deviceInfo: '',
 	    JIM : new jimSdk(),
 		conversations: [],
@@ -69,7 +70,7 @@ const store = new Vuex.Store({
 		},
 		changeLang: function(state) {
 			uni.showActionSheet({
-				itemList:['བོད་ཡིག','简体中文'],
+				itemList:['བོད་ཡིག', '简体中文'],
 				success: function(e) {
 					var langStr = ""
 					if(e.tapIndex == 0) {
@@ -82,6 +83,7 @@ const store = new Vuex.Store({
 						lang = require('../language/en.js');
 						langStr = "en"
 					}
+					state.userLang = langStr
 					//缓存用户登陆状态
 					uni.setStorage({
 					    key: 'userLang',  

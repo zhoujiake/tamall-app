@@ -1,11 +1,13 @@
 <template>
 	<view class="container">
-		<view class="top-sign">
-			<image src="../../static/imgs/login-bg-top.png" style="width: 100%;"></image>
-		</view>
-		<view class="back-btn yticon icon-zuojiantou-up" @click="navBack"></view>
-		<!-- 设置白色背景防止软键盘把下部绝对定位元素顶上来盖住输入框等 -->
-		<view class="wrapper">
+		<scroll-view class="view-content" scroll-y>
+		
+			<view class="top-sign">
+				<image src="../../static/imgs/login-bg-top.png" style="width: 100%;"></image>
+			</view>
+			<view class="back-btn yticon icon-zuojiantou-up" @click="navBack"></view>
+			<!-- 设置白色背景防止软键盘把下部绝对定位元素顶上来盖住输入框等 -->
+			<view class="wrapper">
 			<view class="left-top-sign">{{lang.regist}}</view>
 			<view class="welcome">
 				{{lang.loginRegistry}}
@@ -85,7 +87,8 @@
 					</button>
 				</view>
 			</form>
-		</view>
+			</view>
+		</scroll-view>
 	</view>
 </template>
 
@@ -103,6 +106,7 @@
 				email: '',
 				verfPassword: '',
 				logining: false,
+				scrollTop: 0,
 			}
 		},
 		onLoad(){
@@ -202,12 +206,15 @@
 		background: #fff;
 	}
 	.container{
-		padding-top: 115px;
 		position:relative;
 		width: 100vw;
 		height: 100vh;
 		overflow: hidden;
 		background: #fff;
+		
+	}
+	.view-content{
+		height: 100%;
 	}
 	.top-sign{
 		position:absolute;
@@ -228,12 +235,13 @@
 	}
 	
 	.wrapper{
-		margin-top: 26upx;
+		margin-top: 46upx;
 		z-index: 10;
 		background: #fff;
 		padding-bottom: 40upx;
 	}
 	.welcome{
+		margin-top: 40px;
 		position:relative;
 		left: 50upx;
 		top: -90upx;
@@ -242,13 +250,15 @@
 		text-shadow: 1px 0px 1px rgba(0,0,0,.3);
 	}
 	.left-top-sign{
+		margin-top: 80px;
 		font-size: 120upx;
 		color: $page-color-base;
 		position:relative;
-		left: -16upx;
+		left: -8upx;
 	}
 	
 	.input-content{
+		margin-top: 40upx;
 		padding: 0 60upx;
 	}
 	.input-item{

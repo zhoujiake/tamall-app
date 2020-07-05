@@ -24,7 +24,14 @@
 				<view class="image-wrapper">
 					<image :src="item.goodsCoverImg" mode="aspectFill"></image>
 				</view>
-				<text class="title clamp">{{item.goodsName}}</text>
+				
+				<text v-if="userLang === 'tb'" class="title clamp">
+					{{switchLanguageForString(item.goodsName, 0)}}
+				</text>
+				<text v-else class="title clamp">
+					{{switchLanguageForString(item.goodsName, 1)}}
+				</text>
+				
 				<view class="price-box">
 					<text class="price">{{lang.moneyFlag + item.sellingPrice}}</text>
 				</view>
@@ -78,7 +85,8 @@
 		},
 		computed:{
 			...mapState([
-				'lang'
+				'lang',
+				'userLang'
 			])
 		},
 		onLoad(options) {
@@ -232,7 +240,16 @@
 					url: `/pages/product/product?id=${id}`
 				})
 			},
-			stopPrevent(){}
+			stopPrevent(){},
+			// 分类名称语言切换
+			switchLanguageForString(str, index){
+				if(str.indexOf("|") == -1) {
+					return str
+				} else {
+					var arr = str.split('|');
+					return arr[index];
+				}
+			},
 		},
 	}
 </script>

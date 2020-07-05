@@ -222,7 +222,7 @@ import {mapState, mapMutations} from 'vuex';
 			var title = this.lang.toChat;
 			setTimeout(() => {
 				uni.setNavigationBarTitle({
-					title: this.targetNickname
+					title: title
 				});
 			},300)
 			this.setChatVueObject(this)
